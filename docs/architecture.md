@@ -32,6 +32,10 @@ flowchart LR
 
 估算是協助篩選的上下界，不是獲利保證。受限的範圍不建立自動交付工作；必須轉人工審查或縮小成安全的讀取／草擬作業。任何對外平台串接皆為選配 adapter，不影響無憑證 mock 路徑的完整性。
 
+## 金流 adapter
+
+所有正式金流先建立本機付款嘗試，再透過 hosted checkout 或 tokenized SDK 交給 PSP；付款只有在背景驗簽或伺服器反查，且商戶訂單、lead、固定報價與幣別完全一致後才成立。綠界 AIO 已具備結帳與回呼 adapter；其他台灣 provider 的完成條件見 [台灣與開源金流接入](taiwan-payments.md)。開源支付編排器是可選的基礎設施，不能替代 PSP 合約或 KYC。
+
 ## 專案狀態
 
 ```text

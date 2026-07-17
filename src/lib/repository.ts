@@ -73,6 +73,19 @@ export type ProjectRow = {
   updated_at: string;
 };
 
+export type PaymentAttemptRow = {
+  id: string;
+  provider: string;
+  provider_order_id: string;
+  provider_event_id: string | null;
+  lead_id: string;
+  amount_minor: number;
+  currency: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type JobRow = {
   id: string;
   project_id: string | null;
@@ -216,6 +229,49 @@ export function getLead(leadId: string): LeadRow | undefined {
   return getDb().prepare("SELECT * FROM leads WHERE id = ?").get(leadId) as LeadRow | undefined;
 }
 
+export function createPaymentAttempt(input: {
+  provider: "ecpay";
+  providerOrderId: string;
+  leadId: string;
+  amountMinor: number;
+  currency: string;
+}): PaymentAttemptRow {
+  const db = getDb();
+  const lead = getLead(input.leadId);
+  if (!lead) throw new Error("Lead does not exist");
+  if (lead.status !== "qualified") throw new Error("Lead is not eligible for checkout");
+  const offer = getPublicOffer(resolveLocale(lead.locale));
+  if (input.amountMinor !== offer.setupMinor || input.currency !== offer.currency) {
+    throw new Error("Checkout amount or currency does not match the approved offer");
+  }
+  const attemptId = id();
+  const timestamp = now();
+  db.transaction(() => {
+    db.prepare(
+      `INSERT INTO payment_attempts
+        (id, provider, provider_order_id, lead_id, amount_minor, currency, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
+    ).run(
+      attemptId,
+      input.provider,
+      input.providerOrderId,
+      input.leadId,
+      input.amountMinor,
+      input.currency,
+      timestamp,
+      timestamp
+    );
+    audit(db, "checkout", "payment_attempt.created", "payment_attempt", attemptId, {
+      provider: input.provider,
+      providerOrderId: input.providerOrderId,
+      leadId: input.leadId,
+      amountMinor: input.amountMinor,
+      currency: input.currency
+    });
+  })();
+  return db.prepare("SELECT * FROM payment_attempts WHERE id = ?").get(attemptId) as PaymentAttemptRow;
+}
+
 function automationEligibility(lead: LeadRow): { eligible: boolean; reason: string } {
   if (lead.risk_tier === "restricted" || lead.industry === "regulated" || ["write_back", "autonomous_external_action"].includes(lead.requested_scope)) {
     return { eligible: false, reason: "restricted-risk" };
@@ -270,6 +326,24 @@ export function processPaymentSuccess(input: PaymentSuccessInput): {
   if (!input.signatureValid) throw new Error("Payment signature is not valid");
   const lead = getLead(input.leadId);
   if (!lead) throw new Error("Lead does not exist");
+  const offer = getPublicOffer(resolveLocale(lead.locale));
+  if (input.currency !== offer.currency || input.amountMinor !== offer.setupMinor) {
+    throw new Error("Payment amount or currency does not match the approved offer");
+  }
+  let paymentAttempt: PaymentAttemptRow | undefined;
+  if (input.provider === "ecpay") {
+    if (!input.providerOrderId) throw new Error("ECPay merchant order ID is required");
+    paymentAttempt = db.prepare(
+      "SELECT * FROM payment_attempts WHERE provider = ? AND provider_order_id = ?"
+    ).get(input.provider, input.providerOrderId) as PaymentAttemptRow | undefined;
+    if (!paymentAttempt
+      || paymentAttempt.status !== "pending"
+      || paymentAttempt.lead_id !== input.leadId
+      || paymentAttempt.amount_minor !== input.amountMinor
+      || paymentAttempt.currency !== input.currency) {
+      throw new Error("Payment does not match a pending checkout attempt");
+    }
+  }
   const eligibility = automationEligibility(lead);
 
   const paymentId = id();
@@ -297,6 +371,11 @@ export function processPaymentSuccess(input: PaymentSuccessInput): {
           (id, provider, provider_event_id, lead_id, amount_minor, currency, status, created_at)
          VALUES (?, ?, ?, ?, ?, ?, 'succeeded', ?)`
       ).run(paymentId, input.provider, input.providerEventId, input.leadId, input.amountMinor, input.currency, timestamp);
+    }
+    if (paymentAttempt) {
+      db.prepare(
+        "UPDATE payment_attempts SET status = 'paid', provider_event_id = ?, updated_at = ? WHERE id = ?"
+      ).run(input.providerEventId, timestamp, paymentAttempt.id);
     }
     db.prepare(
       `INSERT INTO projects
@@ -625,7 +704,7 @@ export function getDashboardData() {
 
 export function getCounts(): Record<string, number> {
   const db = getDb();
-  const tables = ["leads", "payments", "projects", "approvals", "jobs", "notifications", "audit_log"];
+  const tables = ["leads", "payment_attempts", "payments", "projects", "approvals", "jobs", "notifications", "audit_log"];
   return Object.fromEntries(
     tables.map((table) => [table, (db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).get() as { count: number }).count])
   );

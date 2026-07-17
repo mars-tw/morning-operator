@@ -2,13 +2,20 @@ import { NextResponse } from "next/server";
 import { paymentSuccessSchema } from "@/lib/contracts";
 import { hashPayload, parseLemonOrder, verifyLemonSignature } from "@/lib/payments";
 import { processPaymentSuccess, recordInvalidWebhook } from "@/lib/repository";
+import { readSecret } from "@/lib/secrets";
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
   const payloadHash = hashPayload(rawBody);
   const signature = request.headers.get("x-signature") || "";
   const eventHeader = request.headers.get("x-event-name") || "unknown";
-  const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET || "";
+  let secret = "";
+  try {
+    secret = readSecret("LEMON_SQUEEZY_WEBHOOK_SECRET");
+  } catch {
+    return NextResponse.json({ error: "payment provider is not configured" }, { status: 503 });
+  }
+  if (!secret) return NextResponse.json({ error: "payment provider is not configured" }, { status: 503 });
   if (!verifyLemonSignature(rawBody, signature, secret)) {
     recordInvalidWebhook("lemon_squeezy", `${eventHeader}:${payloadHash.slice(0, 16)}`, payloadHash);
     return NextResponse.json({ error: "invalid signature" }, { status: 401 });

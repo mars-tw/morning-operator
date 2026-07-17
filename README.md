@@ -77,6 +77,8 @@ flowchart LR
 
 The full architecture is in [docs/architecture.md](docs/architecture.md), pack contract in [docs/industry-packs.md](docs/industry-packs.md), approval boundaries in [docs/approval-matrix.md](docs/approval-matrix.md), and the AI organization tree in [docs/organization-tree.md](docs/organization-tree.md).
 
+Payment integration is documented in [payment webhooks](docs/payment-webhooks.md) and the [Taiwan/open-source payment guide](docs/taiwan-payments.md). ECPay AIO checkout and signed callbacks are implemented; NewebPay, TapPay, and LINE Pay are explicitly documented-only until merchant credentials and server-side reconciliation tests exist.
+
 ## Configuration
 
 Copy `.env.example` and set only the adapters you intend to use. Important groups include:

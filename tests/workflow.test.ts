@@ -125,6 +125,21 @@ describe("business workflow", () => {
     expect(getDashboardData().revenueByCurrency).toEqual([{ currency: "USD", amount_minor: 65_000 }]);
   });
 
+  it("does not create a project for a signed underpayment", () => {
+    const created = lead();
+    expect(() => processPaymentSuccess({
+      provider: "mock",
+      providerEventId: "event-underpayment",
+      leadId: created.id,
+      amountMinor: 1,
+      currency: "USD",
+      payloadHash: "f".repeat(64),
+      signatureValid: true
+    })).toThrow("Payment amount or currency does not match the approved offer");
+    expect((getDb().prepare("SELECT COUNT(*) AS count FROM payments").get() as { count: number }).count).toBe(0);
+    expect((getDb().prepare("SELECT COUNT(*) AS count FROM projects").get() as { count: number }).count).toBe(0);
+  });
+
   it("records restricted payment but isolates it from automatic specification and build", async () => {
     const restricted = lead({
       industry: "regulated",

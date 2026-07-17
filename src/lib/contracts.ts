@@ -39,6 +39,7 @@ export type IntakeDraft = z.input<typeof intakeSchema>;
 export const paymentSuccessSchema = z.object({
   provider: z.enum(["mock", "lemon_squeezy", "ecpay"]),
   providerEventId: z.string().min(4).max(200),
+  providerOrderId: z.string().min(4).max(200).optional(),
   leadId: z.uuid(),
   amountMinor: z.number().int().positive().max(1_000_000_000),
   currency: z.string().trim().length(3).transform((value) => value.toUpperCase()),

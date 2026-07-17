@@ -5,7 +5,8 @@
 | 項目 | 必要資料／動作 | 完成後填入 |
 |---|---|---|
 | 稅籍與發票 | 依實際營運與銷售地區確認網路勞務、網站揭露、稅與發票方式 | 正式網站頁尾與會計流程 |
-| 收款 | 目標市場可用的金流 KYC、銀行帳號、幣別與測試商品 | `NEXT_PUBLIC_CHECKOUT_URL`、價格／幣別、webhook secret |
+| 收款 | 目標市場可用的金流 KYC、銀行帳號、幣別、退款／爭議流程與測試商品 | `NEXT_PUBLIC_CHECKOUT_URL`、價格／幣別、provider secret |
+| 台灣綠界 | AIO 商家審核、MerchantID、HashKey/HashIV、stage 與正式交易驗收 | `ECPAY_ENVIRONMENT` 與 ECPay secrets；詳見 `docs/taiwan-payments.md` |
 | 寄信 | 驗證寄件網域、建立 API key | `RESEND_API_KEY`、`OPERATOR_FROM_EMAIL` |
 | 網域 | 購買網域、設定 DNS 與 TLS | `AUTOPILOT_BASE_URL` |
 | 管理登入 | 產生強密碼與至少 32 字元 session secret | `ADMIN_PASSWORD`、`ADMIN_SESSION_SECRET` |

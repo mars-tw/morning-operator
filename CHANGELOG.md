@@ -6,6 +6,8 @@ All notable changes are documented here. This project follows semantic versionin
 
 ### Added
 
+- ECPay AIO hosted checkout, signed callbacks, fixed-price payment attempts, replay-safe project creation, and Taiwan payment-provider documentation.
+- Payment provider readiness in the owner dashboard, Docker-style provider secret files, and official ECPay CheckMacValue test vectors.
 - English, Traditional Chinese, Japanese, and Spanish public experiences.
 - Open-source governance, contributor templates, self-hosting documentation, and container deployment.
 - Locale-aware lead intake and explicit demo-mode boundaries.

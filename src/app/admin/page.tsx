@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
+import { getPaymentProviderStatuses } from "@/lib/payment-providers";
 import { getDashboardData } from "@/lib/repository";
 import { formatMinorMoney, getPublicOffer } from "@/lib/public-config";
 
@@ -12,6 +13,12 @@ const labels: Record<string, string> = {
   qa_passed: "QA 通過", deploy_approval: "部署待批", delivered: "已交付",
   pending: "排隊", running: "執行中", retry: "等待重試", succeeded: "完成", dead: "人工處理"
 };
+
+const paymentStateLabels = {
+  development_only: "僅開發環境",
+  implemented: "已實作",
+  documented_only: "僅接入藍圖"
+} as const;
 
 function operatorClock(timeZone: string): string {
   try {
@@ -27,6 +34,7 @@ export default async function AdminPage() {
   const data = getDashboardData();
   const operatorTimeZone = process.env.OPERATOR_TIME_ZONE || "UTC";
   const offer = getPublicOffer("zh-TW");
+  const paymentProviderStatuses = getPaymentProviderStatuses();
   const revenue = data.revenueByCurrency.length
     ? data.revenueByCurrency.map((item) => formatMinorMoney(item.amount_minor, item.currency, "zh-TW")).join(" · ")
     : "—";
@@ -57,6 +65,8 @@ export default async function AdminPage() {
       </section>
 
       <section className="admin-section"><h2>名單與收款</h2><div className="data-scroll"><table className="data-table"><thead><tr><th>品牌</th><th>語系</th><th>分數</th><th>估算工時</th><th>狀態</th><th>本機驗收</th></tr></thead><tbody>{data.leads.map((lead) => <tr key={lead.id}><td><strong>{lead.brand_name}</strong><br/><small>{lead.email}</small></td><td>{lead.locale}</td><td>{lead.score}/100</td><td>{lead.estimated_monthly_hours} h/月</td><td><span className="pill">{lead.status}</span></td><td>{lead.status !== "customer" ? <form className="inline-form" method="post" action="/api/webhooks/payments/mock"><input type="hidden" name="leadId" value={lead.id}/><input type="hidden" name="currency" value={offer.currency}/><input name="amountMinor" type="number" defaultValue={offer.setupMinor} min="1"/><button>模擬付款</button></form> : "已付款"}</td></tr>)}</tbody></table></div></section>
+
+      <section className="admin-section"><h2>金流接入狀態</h2><div className="data-scroll"><table className="data-table"><thead><tr><th>供應商</th><th>市場</th><th>實作狀態</th><th>設定</th><th>付款成立條件</th></tr></thead><tbody>{paymentProviderStatuses.map((provider) => <tr key={provider.id}><td><strong>{provider.name}</strong><br/><small>{provider.id}</small></td><td>{provider.market}</td><td><span className="pill">{paymentStateLabels[provider.state]}</span></td><td>{provider.configured ? "已具備必要設定" : provider.state === "documented_only" ? "接入藍圖" : "缺少必要設定"}</td><td>{provider.confirmationRule}</td></tr>)}</tbody></table></div><p className="utility">接入藍圖不代表已可收款；正式啟用仍需商家 KYC、測試交易與負責人批准。</p></section>
 
       <section className="admin-section"><h2>專案</h2><div className="data-scroll"><table className="data-table"><thead><tr><th>專案</th><th>狀態</th><th>建立時間</th><th>產物</th></tr></thead><tbody>{data.projects.map((project) => { const item = project as { id: string; name: string; state: string; created_at: string; build_artifact_path?: string }; return <tr key={item.id}><td>{item.name}<br/><small>{item.id.slice(0,8)}</small></td><td><span className="pill">{labels[item.state] || item.state}</span></td><td>{item.created_at}</td><td>{item.build_artifact_path || "—"}</td></tr>; })}</tbody></table></div></section>
 

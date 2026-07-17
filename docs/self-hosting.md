@@ -74,14 +74,17 @@ GET /api/health
 
 ## 4. 金流、Email 與可選 secrets
 
-Compose 預設用 Docker secrets 掛載管理密碼與 session secret，且不把 provider 金鑰直接放進 Compose environment。正式環境應使用額外 Compose override 將 Lemon Squeezy 和 Resend 金鑰掛成 secrets：
+Compose 預設用 Docker secrets 掛載管理密碼與 session secret，且不把 provider 金鑰提交進 Compose 檔案。正式環境應使用額外 Compose override 將 Lemon Squeezy、ECPay 和 Resend 金鑰掛成 secrets；目前應用程式直接讀取對應環境變數，部署入口可由 secret manager 將檔案內容注入環境，避免秘密出現在 image 或 Git：
 
 ```yaml
 services:
   web:
     environment:
       LEMON_SQUEEZY_WEBHOOK_SECRET_FILE: /run/secrets/lemon_webhook
-    secrets: [lemon_webhook]
+      ECPAY_MERCHANT_ID_FILE: /run/secrets/ecpay_merchant_id
+      ECPAY_HASH_KEY_FILE: /run/secrets/ecpay_hash_key
+      ECPAY_HASH_IV_FILE: /run/secrets/ecpay_hash_iv
+    secrets: [lemon_webhook, ecpay_merchant_id, ecpay_hash_key, ecpay_hash_iv]
   worker:
     environment:
       RESEND_API_KEY_FILE: /run/secrets/resend_api_key
@@ -90,6 +93,12 @@ services:
 secrets:
   lemon_webhook:
     file: /secure/path/lemon_webhook
+  ecpay_merchant_id:
+    file: /secure/path/ecpay_merchant_id
+  ecpay_hash_key:
+    file: /secure/path/ecpay_hash_key
+  ecpay_hash_iv:
+    file: /secure/path/ecpay_hash_iv
   resend_api_key:
     file: /secure/path/resend_api_key
 ```
@@ -101,6 +110,8 @@ https://autopilot.example.com/api/webhooks/payments/lemon-squeezy
 ```
 
 上線前必須實際完成一筆 sandbox／測試訂單，確認簽章、`lead_id`、幣別、最小貨幣單位金額、冪等與重送流程。production 模式不提供 mock payment route。
+
+台灣部署可使用已實作的 ECPay AIO 路徑。將公開報價設為 TWD、checkout URL 設為 `/api/payments/ecpay/checkout?leadId={leadId}`，並依 [台灣與開源金流接入](taiwan-payments.md) 完成付款嘗試、CheckMacValue、低付、重送與正式切換驗收。NewebPay、TapPay 與 LINE Pay 目前只有接入藍圖，未完成 adapter 前不可在營運畫面標成可收款。
 
 ## 5. 備份與還原演練
 

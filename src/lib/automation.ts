@@ -16,6 +16,7 @@ import {
   markQa,
   type JobRow
 } from "./repository";
+import { readSecret } from "./secrets";
 
 const log = pino({ level: process.env.LOG_LEVEL || "info" });
 
@@ -64,7 +65,7 @@ async function handleJob(job: JobRow): Promise<string | undefined> {
   if (job.type === "send_notifications") {
     const queued = getQueuedNotifications();
     for (const notification of queued) {
-      const apiKey = process.env.RESEND_API_KEY;
+      const apiKey = readSecret("RESEND_API_KEY");
       const from = process.env.OPERATOR_FROM_EMAIL;
       if (!apiKey || !from || notification.recipient.endsWith("@example.com")) {
         markNotification(notification.id, "preview", {

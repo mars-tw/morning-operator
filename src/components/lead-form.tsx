@@ -134,7 +134,7 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
         {result.riskTier === "restricted" ? (
           <><h3>{t("audit.notQualified")}</h3><p>{t("estimate.restricted")}</p></>
         ) : result.qualified ? (
-          <><h3>{t("audit.qualified")}</h3><p>{t("audit.qualifiedNext")}</p><a className="button primary" href={process.env.NEXT_PUBLIC_CHECKOUT_URL || "mailto:hello@example.com?subject=Morning%20Operator%20demo"}>{t("audit.book")}</a></>
+          <><h3>{t("audit.qualified")}</h3><p>{t("audit.qualifiedNext")}</p><a className="button primary" href={(process.env.NEXT_PUBLIC_CHECKOUT_URL || "mailto:hello@example.com?subject=Morning%20Operator%20demo").replace("{leadId}", encodeURIComponent(result.leadId))}>{t("audit.book")}</a></>
         ) : (
           <><h3>{t("audit.notQualified")}</h3><p>{t("audit.notQualifiedNext")}</p></>
         )}

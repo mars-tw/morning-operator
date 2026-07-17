@@ -54,6 +54,20 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   UNIQUE(provider, provider_event_id)
 );
 
+CREATE TABLE IF NOT EXISTS payment_attempts (
+  id TEXT PRIMARY KEY,
+  provider TEXT NOT NULL,
+  provider_order_id TEXT NOT NULL,
+  provider_event_id TEXT,
+  lead_id TEXT NOT NULL REFERENCES leads(id),
+  amount_minor INTEGER NOT NULL,
+  currency TEXT NOT NULL,
+  status TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(provider, provider_order_id)
+);
+
 CREATE TABLE IF NOT EXISTS payments (
   id TEXT PRIMARY KEY,
   provider TEXT NOT NULL,

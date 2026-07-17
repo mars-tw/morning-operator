@@ -16,8 +16,8 @@
 
 ## 事故
 
-- 金流簽章錯誤：不建專案，保留雜湊與錯誤紀錄，人工查 provider 後台。
+- 金流簽章錯誤：不建專案，保留雜湊與錯誤紀錄，人工查 provider 後台；不得把 raw webhook 或秘密貼入 issue。
+- 已扣款但未建專案：比對 `payment_attempts`、provider 訂單、事件 ID、固定報價與幣別；不要手動偽造成功事件。
 - 工作 dead-letter：不要無限重跑；先看最後錯誤與 artifact。
 - 機密外洩：立即停 worker、輪替憑證、保存 audit log、判定通知義務。
 - 資料庫異常：停止寫入，複製 `var/data`，從最近備份回復到新路徑後執行 integrity check。
-
