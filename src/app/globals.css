@@ -74,9 +74,23 @@ body::before {
 .conveyor b { color: var(--red); animation: pulseLine 2.6s ease-in-out infinite; }
 @keyframes pulseLine { 50% { transform: translateX(6px); opacity: .5; } }
 
-.offer, .faq { max-width: 1120px; margin: 0 auto; padding: 90px 32px; }
+.pack-section, .offer, .faq { max-width: 1120px; margin: 0 auto; padding: 90px 32px; }
 .section-intro { max-width: 780px; margin-bottom: 44px; }
 .section-intro h2, .fit-section h2, .form-heading h2 { font-family: var(--display); font-size: clamp(38px, 5vw, 66px); line-height: 1.15; margin: 12px 0; letter-spacing: -.025em; }
+.section-intro > p:last-child { color: var(--ink-soft); }
+.pack-section { border-top: 5px solid var(--ink); }
+.pack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; border: 1px solid var(--line); background: var(--line); }
+.pack-card { position: relative; min-height: 260px; padding: 26px; background: var(--paper-bright); display: flex; flex-direction: column; transition: background .15s ease, transform .15s ease; }
+.pack-card:hover { z-index: 1; background: #fff; transform: translateY(-4px); box-shadow: 0 8px 0 var(--ink); }
+.pack-card h3 { margin: 38px 0 10px; font-family: var(--display); font-size: 25px; line-height: 1.2; }
+.pack-card p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+.pack-card small { margin-top: auto; padding-top: 18px; color: var(--teal); font-family: var(--utility); font-weight: 800; }
+.pack-index { position: absolute; top: 26px; left: 26px; font-family: var(--utility); font-size: 10px; color: var(--red); }
+.risk-badge { display: inline-flex; align-items: center; width: fit-content; border: 1px solid currentColor; padding: 3px 7px; font-family: var(--utility); font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.pack-card .risk-badge { position: absolute; top: 22px; right: 22px; }
+.risk-badge.low { color: var(--teal-dark); background: rgba(8,122,120,.08); }
+.risk-badge.medium { color: #805609; background: rgba(215,152,45,.12); }
+.risk-badge.restricted { color: var(--red); background: rgba(195,75,50,.1); }
 .offer-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 28px; }
 .offer-main, .boundary { border: 1px solid var(--line); padding: 38px; background: rgba(247,251,251,.7); }
 .offer-main { border-top: 8px solid var(--teal); }
@@ -99,6 +113,9 @@ body::before {
 .audit-form, .result-card { background: var(--paper-bright); border: 1px solid var(--ink); box-shadow: 12px 12px 0 var(--ink); padding: clamp(28px, 5vw, 64px); }
 .form-heading { max-width: 760px; margin-bottom: 40px; }
 .form-heading h2 { font-size: clamp(34px, 4vw, 54px); }
+.blueprint-strip { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; margin: -16px 0 34px; padding: 12px 15px; border: 1px solid var(--line); border-left: 6px solid var(--teal); background: rgba(8,122,120,.05); font-family: var(--utility); }
+.blueprint-strip span, .blueprint-strip small { color: var(--ink-soft); font-size: 10px; }
+.blueprint-strip strong { font-family: var(--display); }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 28px; }
 .form-grid label, .login-card label { position: relative; display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 800; }
 .form-grid .wide { grid-column: 1 / -1; }
@@ -115,6 +132,11 @@ input:focus, select:focus, textarea:focus { border-bottom: 3px solid var(--teal)
 .result-number small { font-size: 15px; }
 .result-card h3 { font-family: var(--display); font-size: 30px; }
 .result-card .button { margin: 18px 0; }
+.estimate-grid { margin: 34px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); text-align: left; }
+.estimate-grid > div { min-height: 130px; padding: 20px; background: var(--paper-bright); display: flex; flex-direction: column; gap: 12px; }
+.estimate-grid span { color: var(--ink-soft); font-size: 12px; }
+.estimate-grid strong { font-family: var(--utility); font-size: 17px; }
+.estimate-disclaimer { margin: 24px auto 14px; max-width: 600px; color: var(--ink-soft); font-size: 12px; }
 
 .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
 details { background: var(--paper-bright); padding: 24px; }
@@ -162,6 +184,7 @@ footer .utility { color: var(--line); }
   .hero { grid-template-columns: 1fr; padding-top: 56px; gap: 48px; }
   .hero h1 { font-size: clamp(50px, 14vw, 82px); }
   .conveyor { overflow-x: auto; grid-template-columns: repeat(7, max-content); gap: 28px; justify-content: start; }
+  .pack-grid { grid-template-columns: repeat(2, 1fr); }
   .offer-grid, .fit-section, .faq-grid { grid-template-columns: 1fr; }
   .fit-section { gap: 26px; }
   .metric-grid { grid-template-columns: repeat(3, 1fr); }
@@ -177,7 +200,10 @@ footer .utility { color: var(--line); }
   .hero { padding: 48px 20px; }
   .hero-actions { align-items: flex-start; flex-direction: column; }
   .report-sheet { padding: 22px; transform: none; }
-  .offer, .faq, .audit-section, .fit-section { padding-left: 20px; padding-right: 20px; }
+  .pack-section, .offer, .faq, .audit-section, .fit-section { padding-left: 20px; padding-right: 20px; }
+  .pack-grid, .estimate-grid { grid-template-columns: 1fr; }
+  .pack-card { min-height: 220px; }
+  .blueprint-strip { grid-template-columns: 1fr; gap: 3px; }
   .offer-main, .boundary, .audit-form, .result-card { padding: 26px 22px; }
   .offer-main ul { columns: 1; }
   .price { grid-template-columns: 1fr; }

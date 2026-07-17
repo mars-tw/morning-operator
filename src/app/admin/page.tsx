@@ -44,7 +44,12 @@ export default async function AdminPage() {
       <section className="admin-section"><h2>需要你批准</h2>
         {data.approvals.length ? <div className="approval-list">{data.approvals.map((approval) => {
           const item = approval as { id: string; project_name: string; kind: string; summary: string; created_at: string };
-          return <article className="approval-card" key={item.id}><p className="eyebrow">{item.kind === "specification" ? "鎖定交付規格" : "批准正式交付"}</p><h3>{item.project_name}</h3><pre>{item.summary}</pre><p className="utility">建立於 {item.created_at}</p><div className="approval-actions">
+          const approvalLabel = item.kind === "specification"
+            ? "鎖定交付規格"
+            : item.kind === "deployment"
+              ? "批准正式交付"
+              : `核准流程邊界｜${item.kind.replace("pack:", "")}`;
+          return <article className="approval-card" key={item.id}><p className="eyebrow">{approvalLabel}</p><h3>{item.project_name}</h3><pre>{item.summary}</pre><p className="utility">建立於 {item.created_at}</p><div className="approval-actions">
             <form method="post" action={`/api/admin/approvals/${item.id}`}><input type="hidden" name="decision" value="approved" /><input type="hidden" name="note" value="負責人於營運總部批准" /><button className="button primary">批准並繼續</button></form>
             <form method="post" action={`/api/admin/approvals/${item.id}`}><input type="hidden" name="decision" value="rejected" /><input type="hidden" name="note" value="負責人退回修改" /><button className="button danger">退回修改</button></form>
           </div></article>;

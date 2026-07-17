@@ -1,14 +1,11 @@
-import { test, expect } from "@playwright/test";
-import { execFileSync } from "node:child_process";
+import { test, expect, type Page } from "@playwright/test";
 
-function drainWorkers() {
-  const pnpmCli = process.env.npm_execpath;
-  if (!pnpmCli) throw new Error("npm_execpath is required to run the worker from E2E");
-  execFileSync(process.execPath, [pnpmCli, "worker:drain"], {
-    cwd: process.cwd(),
-    env: { ...process.env, AUTOPILOT_AI_MODE: "mock" },
-    stdio: "pipe"
+async function drainWorkers(page: Page) {
+  const response = await page.evaluate(async () => {
+    const result = await fetch("/api/admin/worker/drain", { method: "POST" });
+    return { ok: result.ok, status: result.status, body: await result.text() };
   });
+  expect(response.ok, `worker drain ${response.status}: ${response.body}`).toBe(true);
 }
 
 test("root negotiates English and every public locale is addressable", async ({ page }) => {
@@ -27,7 +24,7 @@ test("language switcher keeps the public page keyboard-addressable", async ({ pa
   await page.goto("/en");
   await page.getByRole("link", { name: "日本語", exact: true }).click();
   await expect(page).toHaveURL(/\/ja$/);
-  await expect(page.getByRole("heading", { name: "最初の会議前に、今日の優先事項を把握。" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "反復業務を測り、安全な部分を自動化。" })).toBeVisible();
 });
 
 test("localized public intake returns a concrete result", async ({ page }) => {
@@ -39,7 +36,24 @@ test("localized public intake returns a concrete result", async ({ page }) => {
   await page.locator('input[name="privacyConsent"]').check();
   await page.getByRole("button", { name: "Calculate my estimate" }).click();
   await expect(page.getByText("Audit complete")).toBeVisible();
-  await expect(page.getByText("Your store may be a good fit for this fixed-scope service.")).toBeVisible();
+  await expect(page.getByText("Next, review the anonymized demo before granting any read-only access.")).toBeVisible();
+  await expect(page.getByText("Potentially reducible range")).toBeVisible();
+  await expect(page.locator(".estimate-grid")).toContainText("Setup payback after monthly fee");
+});
+
+test("industry blueprints are visible and restricted work cannot enter automatic checkout", async ({ page }) => {
+  await page.goto("/en");
+  await expect(page.locator(".pack-card")).toHaveCount(6);
+  await page.getByRole("link", { name: "Start the free 3-minute audit" }).click();
+  await page.locator('input[name="brandName"]').fill("Restricted Browser Test");
+  await page.locator('input[name="email"]').fill("restricted@example.com");
+  await page.locator('select[name="industry"]').selectOption("regulated");
+  await page.locator('select[name="requestedScope"]').selectOption("autonomous_external_action");
+  await page.locator('input[name="privacyConsent"]').check();
+  await page.getByRole("button", { name: "Calculate my estimate" }).click();
+  await expect(page.getByText("Restricted automation")).toBeVisible();
+  await expect(page.getByText("This request needs specialist review and cannot enter the automatic build path.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Book a 20-minute fit call" })).toHaveCount(0);
 });
 
 test("localized page has no horizontal overflow on mobile", async ({ page }) => {
@@ -47,17 +61,18 @@ test("localized page has no horizontal overflow on mobile", async ({ page }) => 
   await page.goto("/es");
   const sizes = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
   expect(sizes.content).toBeLessThanOrEqual(sizes.viewport + 1);
-  await expect(page.getByRole("heading", { name: "Conoce las prioridades del día antes de tu primera reunión." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mide el trabajo repetitivo. Automatiza las partes seguras." })).toBeVisible();
 });
 
 test("owner can sign in to the operations dashboard", async ({ page }) => {
   await page.goto("/admin/login");
-  await page.locator('input[name="password"]').fill("demo-only-change-me");
+  await page.locator('input[name="password"]').fill(process.env.ADMIN_PASSWORD!);
   await page.getByRole("button", { name: "進入總部" }).click();
   await expect(page.getByRole("heading", { name: "今天要處理什麼" })).toBeVisible();
 });
 
 test("owner approval gates payment, build, QA, and delivery", async ({ page }) => {
+  test.slow();
   const brand = `批准流程 ${Date.now()}`;
   const intake = await page.request.post("/api/intake", { data: {
     locale: "en", brandName: brand, email: `approval-${Date.now()}@example.com`, storeUrl: "https://approval.example.com",
@@ -69,17 +84,20 @@ test("owner approval gates payment, build, QA, and delivery", async ({ page }) =
   expect(intake.ok()).toBe(true);
 
   await page.goto("/admin/login");
-  await page.locator('input[name="password"]').fill("demo-only-change-me");
+  await page.locator('input[name="password"]').fill(process.env.ADMIN_PASSWORD!);
   await page.getByRole("button", { name: "進入總部" }).click();
   const leadRow = page.locator("tbody tr").filter({ hasText: brand }).first();
   await leadRow.getByRole("button", { name: "模擬付款" }).click();
-  drainWorkers();
-  await page.reload();
+  await drainWorkers(page);
+  await page.goto("/admin");
 
-  const specCard = page.locator(".approval-card").filter({ hasText: brand });
-  await specCard.getByRole("button", { name: "批准並繼續" }).click();
-  drainWorkers();
-  await page.reload();
+  for (let index = 0; index < 4; index += 1) {
+    const scopeCard = page.locator(".approval-card").filter({ hasText: brand }).first();
+    await expect(scopeCard).toBeVisible();
+    await scopeCard.getByRole("button", { name: "批准並繼續" }).click();
+  }
+  await drainWorkers(page);
+  await page.goto("/admin");
 
   const deploymentCard = page.locator(".approval-card").filter({ hasText: brand });
   await deploymentCard.getByRole("button", { name: "批准並繼續" }).click();

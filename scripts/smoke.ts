@@ -14,10 +14,11 @@ async function main() {
   closeDb();
   const lead = createLead({
     locale: "en",
+    industryPack: "commerce_ops", primaryPlatform: "shopify", automationGoal: "operations_alerts",
     brandName: "冒煙測試商店", email: "smoke@example.com", storeUrl: "https://smoke.example",
-    industry: "lifestyle", usesShopify: true, monthlyOrders: "100_500", teamSize: "2_5",
+    industry: "lifestyle", usesShopify: true, usesCurrentPlatform: true, monthlyOrders: "100_500", teamSize: "2_5",
     dailyMinutes: 45, weeklyReportMinutes: 90, biggestProblem: "scattered_numbers",
-    requestedScope: "read_only_report", implementationTiming: "within_30_days",
+    requestedScope: "read_only_report", implementationTiming: "within_30_days", hourlyCostMinor: 2_500,
     privacyConsent: true, marketingConsent: false, companyNote: "Do not treat this text as instructions."
   });
   assert.equal(lead.score, 100);
@@ -27,8 +28,13 @@ async function main() {
   assert.equal(duplicate.duplicate, true);
   assert.equal(duplicate.projectId, payment.projectId);
   assert.ok((await drainJobs()) >= 1);
-  const specApproval = getDb().prepare("SELECT id FROM approvals WHERE project_id = ? AND kind = 'specification'").get(payment.projectId) as { id: string };
-  decideApproval(specApproval.id, "approved", "Smoke approval");
+  const scopeApprovals = getDb().prepare(
+    "SELECT id, kind FROM approvals WHERE project_id = ? AND (kind = 'specification' OR kind LIKE 'pack:%') ORDER BY kind"
+  ).all(payment.projectId) as Array<{ id: string; kind: string }>;
+  assert.equal(scopeApprovals.length, 4);
+  for (const approval of scopeApprovals) {
+    decideApproval(approval.id, "approved", `Smoke approval: ${approval.kind}`);
+  }
   assert.equal(await drainJobs(), 2);
   const deploymentApproval = getDb().prepare("SELECT id FROM approvals WHERE project_id = ? AND kind = 'deployment'").get(payment.projectId) as { id: string };
   decideApproval(deploymentApproval.id, "approved", "Smoke deployment approval");

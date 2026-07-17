@@ -37,10 +37,13 @@ export function getPublicOffer(locale: Locale) {
   const currency = configuredCurrency();
   const setupMinor = configuredMinor("NEXT_PUBLIC_OFFER_SETUP_MINOR", 65_000);
   const monthlyMinor = configuredMinor("NEXT_PUBLIC_OFFER_MONTHLY_MINOR", 6_500);
+  const defaultHourlyCostMinor = configuredMinor("NEXT_PUBLIC_DEFAULT_HOURLY_COST_MINOR", 2_500);
   return {
     currency,
     setupMinor,
     monthlyMinor,
+    defaultHourlyCostMinor,
+    fractionDigits: currencyFractionDigits(currency),
     setup: formatMinorMoney(setupMinor, currency, locale),
     monthly: formatMinorMoney(monthlyMinor, currency, locale),
     sampleSales: formatMinorMoney(setupMinor * 4, currency, locale),

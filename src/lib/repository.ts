@@ -3,7 +3,10 @@ import type Database from "better-sqlite3";
 import { createTranslator, resolveLocale } from "@/i18n";
 import { getDb } from "./db";
 import {
+  estimateAutomationOutcome,
   estimateMonthlyHours,
+  intakeSchema,
+  type IntakeDraft,
   type IntakeInput,
   type JobType,
   type PaymentSuccessInput,
@@ -11,7 +14,16 @@ import {
   sanitizeCustomerText,
   scoreLead
 } from "./contracts";
+import {
+  automationGoals,
+  getIndustryPack,
+  isIndustryPackId,
+  supportsAutomationGoal,
+  type AutomationGoal,
+  type IndustryPackId
+} from "./industry-packs";
 import { assertProjectTransition } from "./project-machine";
+import { getPublicOffer } from "./public-config";
 
 const now = () => new Date().toISOString();
 const id = () => crypto.randomUUID();
@@ -19,11 +31,16 @@ const id = () => crypto.randomUUID();
 export type LeadRow = {
   id: string;
   locale: string;
+  industry_pack: IndustryPackId;
+  industry_pack_version: number;
+  primary_platform: string;
+  automation_goal: string;
   brand_name: string;
   email: string;
   store_url: string;
   industry: string;
   uses_shopify: number;
+  uses_current_platform: number;
   monthly_orders: string;
   team_size: string;
   daily_minutes: number;
@@ -31,9 +48,15 @@ export type LeadRow = {
   biggest_problem: string;
   requested_scope: string;
   implementation_timing: string;
+  hourly_cost_minor: number;
   company_note: string;
   score: number;
   estimated_monthly_hours: number;
+  risk_tier: string;
+  recoverable_hours_low: number;
+  recoverable_hours_high: number;
+  monthly_value_low: number;
+  monthly_value_high: number;
   status: string;
   created_at: string;
 };
@@ -105,44 +128,65 @@ export function enqueueJob(
   return enqueueInTransaction(getDb(), type, projectId, payload, maxAttempts);
 }
 
-export function createLead(input: IntakeInput): LeadRow {
+export function createLead(rawInput: IntakeDraft): LeadRow {
+  const input: IntakeInput = intakeSchema.parse(rawInput);
   const db = getDb();
   const leadId = id();
   const timestamp = now();
   const score = scoreLead(input);
+  const offer = getPublicOffer(input.locale);
+  const estimate = estimateAutomationOutcome(input, offer.setupMinor, offer.monthlyMinor);
   const t = createTranslator(input.locale);
-  const status = score >= 70 ? "qualified" : score >= 40 ? "nurture" : "not_fit";
+  const status = estimate.riskTier === "restricted" ? "restricted" : estimate.qualified ? "qualified" : score >= 40 ? "nurture" : "not_fit";
   db.transaction(() => {
     db.prepare(
       `INSERT INTO leads (
-        id, locale, brand_name, email, store_url, industry, uses_shopify, monthly_orders, team_size,
-        daily_minutes, weekly_report_minutes, biggest_problem, requested_scope,
-        implementation_timing, privacy_consent, marketing_consent, company_note,
-        score, estimated_monthly_hours, status, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(
-      leadId,
-      input.locale,
-      input.brandName,
-      input.email.toLowerCase(),
-      input.storeUrl,
-      input.industry,
-      input.usesShopify ? 1 : 0,
-      input.monthlyOrders,
-      input.teamSize,
-      input.dailyMinutes,
-      input.weeklyReportMinutes,
-      input.biggestProblem,
-      input.requestedScope,
-      input.implementationTiming,
-      1,
-      input.marketingConsent ? 1 : 0,
-      sanitizeCustomerText(input.companyNote),
+        id, locale, industry_pack, industry_pack_version, primary_platform, automation_goal, brand_name, email, store_url,
+        industry, uses_shopify, uses_current_platform, monthly_orders, team_size, daily_minutes,
+        weekly_report_minutes, biggest_problem, requested_scope, implementation_timing, hourly_cost_minor,
+        privacy_consent, marketing_consent, company_note, score, estimated_monthly_hours, risk_tier,
+        recoverable_hours_low, recoverable_hours_high, monthly_value_low, monthly_value_high, status, created_at
+      ) VALUES (
+        @id, @locale, @industryPack, @industryPackVersion, @primaryPlatform, @automationGoal, @brandName, @email, @storeUrl,
+        @industry, @usesShopify, @usesCurrentPlatform, @monthlyOrders, @teamSize, @dailyMinutes,
+        @weeklyReportMinutes, @biggestProblem, @requestedScope, @implementationTiming, @hourlyCostMinor,
+        @privacyConsent, @marketingConsent, @companyNote, @score, @estimatedMonthlyHours, @riskTier,
+        @recoverableHoursLow, @recoverableHoursHigh, @monthlyValueLow, @monthlyValueHigh, @status, @createdAt
+      )`
+    ).run({
+      id: leadId,
+      locale: input.locale,
+      industryPack: input.industryPack,
+      industryPackVersion: getIndustryPack(input.industryPack).version,
+      primaryPlatform: input.primaryPlatform,
+      automationGoal: input.automationGoal,
+      brandName: input.brandName,
+      email: input.email.toLowerCase(),
+      storeUrl: input.storeUrl,
+      industry: input.industry,
+      usesShopify: input.usesShopify ? 1 : 0,
+      usesCurrentPlatform: input.usesCurrentPlatform ? 1 : 0,
+      monthlyOrders: input.monthlyOrders,
+      teamSize: input.teamSize,
+      dailyMinutes: input.dailyMinutes,
+      weeklyReportMinutes: input.weeklyReportMinutes,
+      biggestProblem: input.biggestProblem,
+      requestedScope: input.requestedScope,
+      implementationTiming: input.implementationTiming,
+      hourlyCostMinor: input.hourlyCostMinor,
+      privacyConsent: 1,
+      marketingConsent: input.marketingConsent ? 1 : 0,
+      companyNote: sanitizeCustomerText(input.companyNote),
       score,
-      estimateMonthlyHours(input),
+      estimatedMonthlyHours: estimate.currentMonthlyHours,
+      riskTier: estimate.riskTier,
+      recoverableHoursLow: estimate.recoverableHours.low,
+      recoverableHoursHigh: estimate.recoverableHours.high,
+      monthlyValueLow: estimate.monthlyValueMinor.low,
+      monthlyValueHigh: estimate.monthlyValueMinor.high,
       status,
-      timestamp
-    );
+      createdAt: timestamp
+    });
     db.prepare(
       `INSERT INTO notifications
         (id, project_id, channel, recipient, subject, body, status, created_at)
@@ -155,13 +199,45 @@ export function createLead(input: IntakeInput): LeadRow {
       timestamp
     );
     enqueueInTransaction(db, "send_notifications", null, { reason: "lead-audit" });
-    audit(db, "public", "lead.created", "lead", leadId, { score, status, locale: input.locale });
+    audit(db, "public", "lead.created", "lead", leadId, {
+      score,
+      status,
+      locale: input.locale,
+      industryPack: input.industryPack,
+      automationGoal: input.automationGoal,
+      riskTier: estimate.riskTier,
+      recoverableHours: estimate.recoverableHours
+    });
   })();
   return db.prepare("SELECT * FROM leads WHERE id = ?").get(leadId) as LeadRow;
 }
 
 export function getLead(leadId: string): LeadRow | undefined {
   return getDb().prepare("SELECT * FROM leads WHERE id = ?").get(leadId) as LeadRow | undefined;
+}
+
+function automationEligibility(lead: LeadRow): { eligible: boolean; reason: string } {
+  if (lead.risk_tier === "restricted" || lead.industry === "regulated" || ["write_back", "autonomous_external_action"].includes(lead.requested_scope)) {
+    return { eligible: false, reason: "restricted-risk" };
+  }
+  if (!isIndustryPackId(lead.industry_pack)) return { eligible: false, reason: "unknown-pack" };
+  const pack = getIndustryPack(lead.industry_pack);
+  if (lead.industry_pack_version !== pack.version) return { eligible: false, reason: "pack-version-mismatch" };
+  if (!automationGoals.includes(lead.automation_goal as AutomationGoal)) return { eligible: false, reason: "unknown-goal" };
+  if (!supportsAutomationGoal(lead.industry_pack, lead.automation_goal as AutomationGoal)) {
+    return { eligible: false, reason: "unsupported-goal" };
+  }
+  return { eligible: true, reason: "eligible" };
+}
+
+function assertProjectEligibleForAutomation(db: Database.Database, projectId: string): LeadRow {
+  const lead = db.prepare(
+    "SELECT l.* FROM leads l JOIN projects p ON p.lead_id = l.id WHERE p.id = ?"
+  ).get(projectId) as LeadRow | undefined;
+  if (!lead) throw new Error("Project lead does not exist");
+  const eligibility = automationEligibility(lead);
+  if (!eligibility.eligible) throw new Error(`Project requires manual review: ${eligibility.reason}`);
+  return lead;
 }
 
 export function recordInvalidWebhook(
@@ -194,6 +270,7 @@ export function processPaymentSuccess(input: PaymentSuccessInput): {
   if (!input.signatureValid) throw new Error("Payment signature is not valid");
   const lead = getLead(input.leadId);
   if (!lead) throw new Error("Lead does not exist");
+  const eligibility = automationEligibility(lead);
 
   const paymentId = id();
   const projectId = id();
@@ -226,18 +303,30 @@ export function processPaymentSuccess(input: PaymentSuccessInput): {
         (id, lead_id, payment_id, name, state, created_at, updated_at)
        VALUES (?, ?, ?, ?, 'paid', ?, ?)`
     ).run(projectId, input.leadId, paymentId, `${lead.brand_name} | ${leadT("brand.name")}`, timestamp, timestamp);
-    db.prepare("UPDATE leads SET status = 'customer' WHERE id = ?").run(input.leadId);
-    enqueueInTransaction(db, "draft_spec", projectId, { projectId });
+    db.prepare("UPDATE leads SET status = ? WHERE id = ?").run(
+      eligibility.eligible ? "customer" : "manual_review",
+      input.leadId
+    );
+    if (eligibility.eligible) enqueueInTransaction(db, "draft_spec", projectId, { projectId });
     db.prepare(
       `INSERT INTO notifications
         (id, project_id, channel, recipient, subject, body, status, created_at)
        VALUES (?, ?, 'email', ?, ?, ?, 'queued', ?)`
-    ).run(id(), projectId, lead.email, leadT("notification.paymentSubject"), leadT("notification.paymentBody"), timestamp);
+    ).run(
+      id(),
+      projectId,
+      lead.email,
+      leadT("notification.paymentSubject"),
+      eligibility.eligible ? leadT("notification.paymentBody") : leadT("notification.manualReviewBody"),
+      timestamp
+    );
     enqueueInTransaction(db, "send_notifications", projectId, { reason: "payment-onboarding" });
     audit(db, "payment-webhook", "payment.succeeded", "project", projectId, {
       provider: input.provider,
       amountMinor: input.amountMinor,
-      currency: input.currency
+      currency: input.currency,
+      automaticBuildEligible: eligibility.eligible,
+      eligibilityReason: eligibility.reason
     });
   })();
   return { duplicate: false, projectId, paymentId };
@@ -255,36 +344,53 @@ export function transitionProject(projectId: string, to: ProjectState, actor: st
 export function createSpecification(projectId: string): string {
   const db = getDb();
   const row = db.prepare(
-    `SELECT p.*, l.brand_name, l.store_url, l.monthly_orders, l.biggest_problem,
-            l.requested_scope, l.company_note
+    `SELECT p.*, l.brand_name, l.store_url, l.industry_pack, l.primary_platform, l.automation_goal,
+            l.monthly_orders, l.biggest_problem, l.requested_scope, l.risk_tier, l.company_note
        FROM projects p JOIN leads l ON l.id = p.lead_id WHERE p.id = ?`
   ).get(projectId) as (ProjectRow & LeadRow) | undefined;
   if (!row) throw new Error("Project does not exist");
   if (row.state !== "paid" && row.state !== "spec_draft") throw new Error("Project is not ready for specification");
+  assertProjectEligibleForAutomation(db, projectId);
 
+  if (!isIndustryPackId(row.industry_pack)) throw new Error("Project requires manual review: unknown-pack");
+  const pack = getIndustryPack(row.industry_pack);
   const spec = [
-    `# ${sanitizeCustomerText(row.brand_name, 80)}｜早安店長交付規格`,
+    `# ${sanitizeCustomerText(row.brand_name, 80)} | Morning Operator delivery specification`,
     "",
-    "## 固定範圍",
-    `- Shopify 商店：${sanitizeCustomerText(row.store_url, 300)}`,
-    `- 訂單區間：${row.monthly_orders}`,
-    "- 最近 30 天訂單匯入。",
-    "- 每日上午 09:00 產生營收、訂單、客單、退款、逾時未出貨與低庫存彙總。",
-    "- 僅使用訂單與庫存唯讀權限；不修改訂單、退款、付款或庫存。",
-    "- AI 輸入不得包含顧客姓名、Email、電話、地址或訂單備註。",
+    "## Approved workflow pack",
+    `- Pack: ${pack.id}@${pack.version}`,
+    `- Risk tier: ${row.risk_tier}`,
+    `- Primary platform: ${sanitizeCustomerText(row.primary_platform, 80)}`,
+    `- Platform URL: ${sanitizeCustomerText(row.store_url, 300)}`,
+    `- Automation goal: ${sanitizeCustomerText(row.automation_goal, 80)}`,
+    `- Monthly work volume: ${row.monthly_orders}`,
+    `- Scope: ${row.requested_scope}`,
     "",
-    "## 主要問題",
+    "## Primary problem",
     `- ${row.biggest_problem}`,
     "",
-    "## 客戶補充（不受信任資料）",
-    `> ${sanitizeCustomerText(row.company_note || "無", 800)}`,
+    "## Success metrics",
+    ...pack.metrics.map((metric) => `- ${metric}`),
     "",
-    "## 驗收條件",
-    "1. 使用匿名 fixture 可重現每日彙總。",
-    "2. 重送同一 webhook 不得重複計入。",
-    "3. 缺少資料時顯示可理解的錯誤，不寄出空白晨報。",
-    "4. 測試、型別檢查與秘密掃描通過。",
-    "5. 正式部署前必須另有部署批准。"
+    "## Required human approvals",
+    ...pack.requiredApprovals.map((approval) => `- ${approval}`),
+    "- production_delivery",
+    "",
+    "## Prohibited actions",
+    ...pack.prohibitedActions.map((action) => `- ${action}`),
+    "- No consequential medical, financial, employment, legal, housing, or safety decision.",
+    "- No external write, send, publish, refund, payment, or deletion without a recorded approval.",
+    "- Do not send unnecessary personal data or raw confidential records to AI systems.",
+    "",
+    "## Customer context (untrusted data)",
+    "> Withheld from the AI build specification. An owner must review and convert any useful context into approved requirements.",
+    "",
+    "## Acceptance criteria",
+    "1. Synthetic fixtures reproduce the approved workflow without real customer records.",
+    "2. Repeated provider events remain idempotent.",
+    "3. Missing or ambiguous data produces a review task instead of an external action.",
+    "4. Pack metrics, typecheck, tests, and secret scan pass.",
+    "5. A separate deployment approval exists before delivery."
   ].join("\n");
 
   db.transaction(() => {
@@ -300,13 +406,52 @@ export function createSpecification(projectId: string): string {
       projectId
     );
     db.prepare(
-      `INSERT OR IGNORE INTO approvals
+      `INSERT INTO approvals
         (id, project_id, kind, status, summary, created_at)
-       VALUES (?, ?, 'specification', 'pending', ?, ?)`
+       VALUES (?, ?, 'specification', 'pending', ?, ?)
+       ON CONFLICT(project_id, kind) DO UPDATE SET
+         status = 'pending', summary = excluded.summary, decided_at = NULL, decision_note = NULL`
     ).run(id(), projectId, spec, now());
+    for (const requiredApproval of pack.requiredApprovals) {
+      db.prepare(
+        `INSERT INTO approvals
+          (id, project_id, kind, status, summary, created_at)
+         VALUES (?, ?, ?, 'pending', ?, ?)
+         ON CONFLICT(project_id, kind) DO UPDATE SET
+           status = 'pending', summary = excluded.summary, decided_at = NULL, decision_note = NULL`
+      ).run(
+        id(),
+        projectId,
+        `pack:${requiredApproval}`,
+        `Required by ${pack.id}@${pack.version}: ${requiredApproval}`,
+        now()
+      );
+    }
     audit(db, "worker", "specification.drafted", "project", projectId);
   })();
   return spec;
+}
+
+function queueBuildWhenAllScopeApprovalsPass(
+  db: Database.Database,
+  project: ProjectRow
+): ProjectState {
+  const approvals = db.prepare(
+    "SELECT kind, status FROM approvals WHERE project_id = ? AND (kind = 'specification' OR kind LIKE 'pack:%')"
+  ).all(project.id) as Array<{ kind: string; status: string }>;
+  const specificationApproved = approvals.some(
+    (approval) => approval.kind === "specification" && approval.status === "approved"
+  );
+  const packApprovals = approvals.filter((approval) => approval.kind.startsWith("pack:"));
+  const allPackApprovalsPassed = packApprovals.length > 0 && packApprovals.every(
+    (approval) => approval.status === "approved"
+  );
+  if (!specificationApproved || !allPackApprovalsPassed) return project.state;
+  if (project.state !== "spec_approval") return project.state;
+  assertProjectTransition(project.state, "build_queued");
+  db.prepare("UPDATE projects SET state = 'build_queued', updated_at = ? WHERE id = ?").run(now(), project.id);
+  enqueueInTransaction(db, "codex_build", project.id, { projectId: project.id });
+  return "build_queued";
 }
 
 export function decideApproval(
@@ -333,11 +478,15 @@ export function decideApproval(
       approvalId
     );
     let nextState = project.state;
-    if (approval.kind === "specification") {
-      nextState = decision === "approved" ? "build_queued" : "spec_draft";
-      assertProjectTransition(project.state, nextState);
-      db.prepare("UPDATE projects SET state = ?, updated_at = ? WHERE id = ?").run(nextState, now(), project.id);
-      if (decision === "approved") enqueueInTransaction(db, "codex_build", project.id, { projectId: project.id });
+    if (approval.kind === "specification" || approval.kind.startsWith("pack:")) {
+      if (decision === "approved") {
+        assertProjectEligibleForAutomation(db, project.id);
+        nextState = queueBuildWhenAllScopeApprovalsPass(db, project);
+      } else {
+        nextState = "spec_draft";
+        assertProjectTransition(project.state, nextState);
+        db.prepare("UPDATE projects SET state = ?, updated_at = ? WHERE id = ?").run(nextState, now(), project.id);
+      }
     } else if (approval.kind === "deployment") {
       nextState = decision === "approved" ? "delivered" : "qa_passed";
       assertProjectTransition(project.state, nextState);
@@ -405,6 +554,7 @@ export function failJob(jobId: string, error: unknown): "retry" | "dead" {
 }
 
 export function markBuildStarted(projectId: string): ProjectRow {
+  assertProjectEligibleForAutomation(getDb(), projectId);
   transitionProject(projectId, "building", "worker");
   return getDb().prepare("SELECT * FROM projects WHERE id = ?").get(projectId) as ProjectRow;
 }

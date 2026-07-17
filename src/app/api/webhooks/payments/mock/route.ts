@@ -5,7 +5,11 @@ import { paymentSuccessSchema } from "@/lib/contracts";
 import { processPaymentSuccess } from "@/lib/repository";
 
 export async function POST(request: NextRequest) {
-  if (process.env.NODE_ENV === "production") return NextResponse.json({ error: "not found" }, { status: 404 });
+  const e2eLoopback = process.env.AUTOPILOT_E2E_MODE === "true"
+    && /^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/i.test(process.env.AUTOPILOT_BASE_URL || "");
+  if (process.env.NODE_ENV === "production" && !e2eLoopback) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
   if (!verifyAdminSession(request.cookies.get(ADMIN_COOKIE)?.value)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }

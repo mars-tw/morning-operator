@@ -1,24 +1,28 @@
 # Morning Operator / 早安店長
 
-**A multilingual, approval-gated operations workflow for small Shopify teams.**
+**A multilingual, approval-gated automation service factory for repeatable business operations.**
 
 English · [繁體中文](README.zh-TW.md) · [日本語](docs/README.ja.md) · [Español](docs/README.es.md)
 
-Morning Operator turns a public lead audit into a controlled service-delivery workflow: intake, fit scoring, signed payment events, scope approval, isolated AI-assisted build, QA, delivery approval, notification, audit log, and backup. It is open source under Apache-2.0 and designed to be self-hosted.
+Morning Operator turns a public workflow audit into a controlled service-delivery pipeline: industry-pack selection, fit scoring, signed payment events, scope approval, isolated AI-assisted build, QA, delivery approval, notification, audit log, and backup. It is open source under Apache-2.0, provider-neutral, and designed to be self-hosted.
 
-> The default configuration is a demo. It does not collect real payments, send real email, connect to Shopify, or deploy generated work. Revenue and time-saved figures are estimates, never guarantees.
+> The default configuration is a demo. It does not collect real payments, send real email, connect to external platforms, or deploy generated work. Revenue, payback, and time-saved figures are estimates, never guarantees. No industry pack guarantees that a business or user will make money.
 
 ## Why this exists
 
-Small commerce teams often copy sales, refunds, fulfillment delays, and inventory warnings into spreadsheets every morning. This project provides the safe workflow around automating that service—not a promise of autonomous income.
+Small teams across many industries repeat the same reporting, lead follow-up, scheduling, content, document, and exception-handling work. This project provides the safe workflow around automating a reviewed portion of that work—not a promise of autonomous income or a replacement for professional judgment.
 
 - Public locales: English, Traditional Chinese, Japanese, and Spanish.
 - Shareable locale URLs: `/en`, `/zh-TW`, `/ja`, and `/es`.
 - Human approval before AI build and before production delivery.
-- Provider adapters for payments, email, monitoring, Shopify, and AI execution.
+- Six versioned industry packs: commerce operations, professional services, appointments, creator/education, property/field services, and back-office operations.
+- Provider-neutral adapters for payments, email, monitoring, business platforms, and AI execution.
 - SQLite job queue with leases, retry backoff, dead-letter state, and audit records.
 - Docker self-hosting with separate web and worker services.
-- No raw Shopify customer personal data is sent to AI.
+- Restricted scopes and consequential decisions are rejected or routed to human review.
+- No unnecessary customer, client, patient, learner, tenant, or employee personal data is sent to AI.
+
+Each pack is a static, reviewable template with supported goals, an estimated automation-coverage range, metrics, approval requirements, and prohibited actions. See [Industry packs](docs/industry-packs.md) before adding or changing a pack.
 
 ## Quick start
 
@@ -57,7 +61,8 @@ The Compose setup uses a persistent SQLite volume, non-root containers, read-onl
 
 ```mermaid
 flowchart LR
-    Visitor["Localized lead audit"] --> Score["Validation and fit score"]
+    Visitor["Localized workflow audit"] --> Pack["Static industry pack"]
+    Pack --> Score["Validation, risk and fit score"]
     Score --> Checkout["Hosted checkout"]
     Checkout --> Verify["Signed, idempotent webhook"]
     Verify --> Scope["Scope draft"]
@@ -70,7 +75,7 @@ flowchart LR
     Approval2 -->|"no"| Revise
 ```
 
-The full architecture is in [docs/architecture.md](docs/architecture.md), approval boundaries in [docs/approval-matrix.md](docs/approval-matrix.md), and the AI organization tree in [docs/organization-tree.md](docs/organization-tree.md).
+The full architecture is in [docs/architecture.md](docs/architecture.md), pack contract in [docs/industry-packs.md](docs/industry-packs.md), approval boundaries in [docs/approval-matrix.md](docs/approval-matrix.md), and the AI organization tree in [docs/organization-tree.md](docs/organization-tree.md).
 
 ## Configuration
 
@@ -82,6 +87,7 @@ Copy `.env.example` and set only the adapters you intend to use. Important group
 - Hosted checkout and signed webhook secret.
 - Verified email sender and monitoring DSN.
 - Approved Codex execution mode and timeout.
+- Optional, least-privilege platform adapters selected for an approved industry pack.
 
 Never commit `.env`, database files, customer data, API credentials, generated workspaces, or payment payloads. See [Production readiness](docs/production-readiness.md) and [external activation](docs/external-activation.md).
 
@@ -96,7 +102,7 @@ pnpm test:e2e
 
 ## Project status
 
-The repository contains a complete demonstrable vertical slice and production safety gates. It does **not** include a hosted public service, merchant KYC, tax registration, a verified sending domain, or real Shopify credentials. Those external actions belong to each deployer.
+The repository contains a complete demonstrable vertical slice, six static industry packs, and production safety gates. It does **not** include a hosted public service, merchant KYC, tax registration, a verified sending domain, or credentials for external business platforms. Those external actions belong to each deployer.
 
 ## Contributing and support
 

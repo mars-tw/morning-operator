@@ -67,6 +67,18 @@ PR 說明應列出實際執行的檢查；無法執行者請說明原因。
 - 互動元件需支援鍵盤操作、可辨識焦點、合理的對比與輔助技術標籤。
 - 新增語系時，請附語言、地區、時區及至少一條主要流程的測試證據。
 
+## 產業包審查 / Industry-pack review
+
+產業包不是可執行的遠端外掛，而是版本化、靜態且可稽核的工作流程合約。新增或調整產業包時：
+
+1. 必須定義穩定 ID、版本、支援目標、自動化覆蓋率估計範圍、指標、必要核准、禁止動作與安全輸入範例。
+2. 必須說明對此產業的實際用例、資料最小化方式、風險等級與人工接管路徑。
+3. 不得以「所有產業都適用」、「全自動獲利」或未經驗證的節省時間數字當作驗收依據。
+4. 金流、退款、法律或醫療建議、住房或聘僱資格、安全認證、銀行轉帳、資料刪除與未審閱對外承諾不可成為自動執行的成功路徑。
+5. 請同時更新四語文案、登錄表驗證、風險分級、估算範圍測試與 [產業包文件](docs/industry-packs.md)。
+
+Industry packs are versioned, static workflow contracts—not executable remote plugins. Keep the application provider-neutral and ensure the complete mock path still works without third-party credentials.
+
 ## Pull Request 審查
 
 維護者會檢查正確性、安全性、隱私、測試、操作風險與專案範圍。所有檢查通過不保證合併；維護者可能要求縮小範圍或提出替代方案。貢獻一經提交，視為依本專案的 Apache-2.0 授權提供。

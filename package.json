@@ -1,11 +1,11 @@
 {
   "name": "zaijia-autopilot-hq",
   "version": "1.0.0",
-  "description": "A multilingual, approval-gated AI operations workflow for Shopify reporting services.",
+  "description": "A multilingual, approval-gated automation service factory for small business operations.",
   "license": "Apache-2.0",
   "keywords": [
     "ai-automation",
-    "shopify",
+    "multi-industry",
     "operations",
     "open-source",
     "self-hosted"
@@ -22,7 +22,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/run-e2e.mjs",
     "worker": "node scripts/validate-env.mjs && tsx scripts/worker.ts",
     "worker:once": "tsx scripts/worker.ts --once",
     "worker:drain": "tsx scripts/drain-worker.ts",
