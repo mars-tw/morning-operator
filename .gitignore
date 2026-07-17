@@ -1,0 +1,17 @@
+node_modules/
+.next/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.local
+.env.production
+var/
+*.log
+*.db
+*.db-shm
+*.db-wal
+dist/
+*.tsbuildinfo
+.playwright-cli/
+output/playwright/

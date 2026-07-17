@@ -1,0 +1,87 @@
+import { test, expect } from "@playwright/test";
+import { execFileSync } from "node:child_process";
+
+function drainWorkers() {
+  const pnpmCli = process.env.npm_execpath;
+  if (!pnpmCli) throw new Error("npm_execpath is required to run the worker from E2E");
+  execFileSync(process.execPath, [pnpmCli, "worker:drain"], {
+    cwd: process.cwd(),
+    env: { ...process.env, AUTOPILOT_AI_MODE: "mock" },
+    stdio: "pipe"
+  });
+}
+
+test("root negotiates English and every public locale is addressable", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/en$/);
+  const expectations = { en: "Morning Operator", "zh-TW": "早安店長", ja: "おはよう店長", es: "Gerente de la Mañana" };
+  for (const [locale, brand] of Object.entries(expectations)) {
+    await page.goto(`/${locale}`);
+    await expect(page.locator("main")).toHaveAttribute("lang", /.+/);
+    await expect(page.getByRole("link", { name: brand, exact: true })).toBeVisible();
+    await expect(page.getByText(/demo|示範|デモ/i).first()).toBeVisible();
+  }
+});
+
+test("language switcher keeps the public page keyboard-addressable", async ({ page }) => {
+  await page.goto("/en");
+  await page.getByRole("link", { name: "日本語", exact: true }).click();
+  await expect(page).toHaveURL(/\/ja$/);
+  await expect(page.getByRole("heading", { name: "最初の会議前に、今日の優先事項を把握。" })).toBeVisible();
+});
+
+test("localized public intake returns a concrete result", async ({ page }) => {
+  await page.goto("/en");
+  await page.getByRole("link", { name: "Start the free 3-minute audit" }).click();
+  await page.locator('input[name="brandName"]').fill("Browser Test Store");
+  await page.locator('input[name="email"]').fill("browser@example.com");
+  await page.locator('input[name="storeUrl"]').fill("https://browser.example.com");
+  await page.locator('input[name="privacyConsent"]').check();
+  await page.getByRole("button", { name: "Calculate my estimate" }).click();
+  await expect(page.getByText("Audit complete")).toBeVisible();
+  await expect(page.getByText("Your store may be a good fit for this fixed-scope service.")).toBeVisible();
+});
+
+test("localized page has no horizontal overflow on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/es");
+  const sizes = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
+  expect(sizes.content).toBeLessThanOrEqual(sizes.viewport + 1);
+  await expect(page.getByRole("heading", { name: "Conoce las prioridades del día antes de tu primera reunión." })).toBeVisible();
+});
+
+test("owner can sign in to the operations dashboard", async ({ page }) => {
+  await page.goto("/admin/login");
+  await page.locator('input[name="password"]').fill("demo-only-change-me");
+  await page.getByRole("button", { name: "進入總部" }).click();
+  await expect(page.getByRole("heading", { name: "今天要處理什麼" })).toBeVisible();
+});
+
+test("owner approval gates payment, build, QA, and delivery", async ({ page }) => {
+  const brand = `批准流程 ${Date.now()}`;
+  const intake = await page.request.post("/api/intake", { data: {
+    locale: "en", brandName: brand, email: `approval-${Date.now()}@example.com`, storeUrl: "https://approval.example.com",
+    industry: "lifestyle", usesShopify: true, monthlyOrders: "100_500", teamSize: "2_5",
+    dailyMinutes: 45, weeklyReportMinutes: 90, biggestProblem: "scattered_numbers",
+    requestedScope: "read_only_report", implementationTiming: "within_30_days",
+    privacyConsent: true, marketingConsent: false, companyNote: "browser approval fixture"
+  } });
+  expect(intake.ok()).toBe(true);
+
+  await page.goto("/admin/login");
+  await page.locator('input[name="password"]').fill("demo-only-change-me");
+  await page.getByRole("button", { name: "進入總部" }).click();
+  const leadRow = page.locator("tbody tr").filter({ hasText: brand }).first();
+  await leadRow.getByRole("button", { name: "模擬付款" }).click();
+  drainWorkers();
+  await page.reload();
+
+  const specCard = page.locator(".approval-card").filter({ hasText: brand });
+  await specCard.getByRole("button", { name: "批准並繼續" }).click();
+  drainWorkers();
+  await page.reload();
+
+  const deploymentCard = page.locator(".approval-card").filter({ hasText: brand });
+  await deploymentCard.getByRole("button", { name: "批准並繼續" }).click();
+  await expect(page.locator("tbody tr").filter({ hasText: brand }).getByText("已交付")).toBeVisible();
+});

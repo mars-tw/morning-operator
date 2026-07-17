@@ -1,0 +1,59 @@
+name: 功能建議 / Feature request
+description: 建議功能、整合、語系或可及性改善 / Suggest a feature, integration, locale, or accessibility improvement
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        請先描述使用者問題，再提出解法。歡迎全球化與可及性貢獻。
+        Start with the user problem, then propose a solution. Internationalization and accessibility contributions are welcome.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前確認 / Preflight
+      options:
+        - label: 我已搜尋現有 Issue 與文件。 / I searched existing issues and documentation.
+          required: true
+        - label: 此建議不要求繞過付款驗證、核准閘門、隱私限制或 AI 沙箱。 / This request does not bypass payment verification, approval gates, privacy controls, or the AI sandbox.
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 使用者問題 / User problem
+      description: 誰遇到什麼問題？請勿提供真實客戶資料。 / Who has which problem? Do not include real customer data.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 預期成果 / Desired outcome
+      description: 如何判斷改善成功？收益與節省時間只能作為估計。 / How would success be evaluated? Revenue and time saved must remain estimates.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 類別 / Area
+      options:
+        - Core workflow / 核心流程
+        - Integration / 第三方整合
+        - Internationalization / 全球化與翻譯
+        - Accessibility / 可及性
+        - Documentation / 文件
+        - Operations and security / 營運與安全
+        - Other / 其他
+    validations:
+      required: true
+  - type: textarea
+    id: locale
+    attributes:
+      label: 地區需求 / Regional context
+      description: 若相關，請提供語言、國家／地區、時區、幣別、日期格式或法規背景。 / If relevant, include language, region, timezone, currency, date format, or regulatory context.
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建議方案 / Proposed solution
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 替代方案 / Alternatives considered

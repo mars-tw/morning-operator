@@ -1,0 +1,76 @@
+name: 錯誤回報 / Bug report
+description: 回報可重現的產品錯誤 / Report a reproducible problem
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝回報。安全漏洞請依 SECURITY.md 私下通報。請勿貼上秘密、付款資料或客戶個資。
+        Thanks for helping. Report vulnerabilities privately through SECURITY.md. Do not include secrets, payment data, or customer information.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前確認 / Preflight
+      options:
+        - label: 我已搜尋現有 Issue，未找到相同問題。 / I searched existing issues for duplicates.
+          required: true
+        - label: 這不是安全漏洞，內容不含秘密或真實客戶資料。 / This is not a security report and contains no secrets or real customer data.
+          required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: 問題摘要 / Summary
+      description: 實際發生什麼？對使用者有何影響？ / What happened and how does it affect users?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 重現步驟 / Steps to reproduce
+      placeholder: |
+        1. 執行…
+        2. 前往…
+        3. 看到…
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 預期行為 / Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: 版本或提交 / Version or commit
+      placeholder: e.g. main at abc1234
+    validations:
+      required: true
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: 執行環境 / Deployment
+      options:
+        - Local development / 本機開發
+        - Self-hosted production / 自行部署
+        - Automated test / 自動測試
+        - Other / 其他
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境資訊 / Environment
+      description: OS、Node/pnpm、瀏覽器、裝置、語系、時區，以及是否使用輔助技術。 / Include OS, Node/pnpm, browser, device, locale, timezone, and assistive technology when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 已清理的紀錄 / Redacted logs
+      description: 僅貼上最少且已去識別化的內容。 / Include only the minimum redacted output.
+      render: shell
+  - type: textarea
+    id: context
+    attributes:
+      label: 其他資訊 / Additional context

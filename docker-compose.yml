@@ -1,0 +1,139 @@
+name: autopilot-hq
+
+x-app-environment: &app-environment
+  NODE_ENV: production
+  AUTOPILOT_DB_PATH: /app/var/data/autopilot.db
+  AUTOPILOT_BASE_URL: ${AUTOPILOT_BASE_URL:?Set AUTOPILOT_BASE_URL to the public HTTPS URL}
+  AUTOPILOT_AI_MODE: ${AUTOPILOT_AI_MODE:-mock}
+  ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+  ADMIN_SESSION_SECRET_FILE: /run/secrets/admin_session_secret
+  NEXT_PUBLIC_CHECKOUT_URL: ${NEXT_PUBLIC_CHECKOUT_URL:-}
+  NEXT_PUBLIC_DEFAULT_LOCALE: ${NEXT_PUBLIC_DEFAULT_LOCALE:-en}
+  NEXT_PUBLIC_DEMO_MODE: ${NEXT_PUBLIC_DEMO_MODE:-true}
+  NEXT_PUBLIC_OFFER_CURRENCY: ${NEXT_PUBLIC_OFFER_CURRENCY:-USD}
+  NEXT_PUBLIC_OFFER_SETUP_MINOR: ${NEXT_PUBLIC_OFFER_SETUP_MINOR:-65000}
+  NEXT_PUBLIC_OFFER_MONTHLY_MINOR: ${NEXT_PUBLIC_OFFER_MONTHLY_MINOR:-6500}
+  LEMON_SQUEEZY_WEBHOOK_SECRET_FILE: ${LEMON_SQUEEZY_WEBHOOK_SECRET_FILE:-}
+  RESEND_API_KEY_FILE: ${RESEND_API_KEY_FILE:-}
+  OPERATOR_EMAIL: ${OPERATOR_EMAIL:-}
+  OPERATOR_FROM_EMAIL: ${OPERATOR_FROM_EMAIL:-}
+  OPERATOR_TIME_ZONE: ${OPERATOR_TIME_ZONE:-UTC}
+  SENTRY_DSN: ${SENTRY_DSN:-}
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  CODEX_MODEL: ${CODEX_MODEL:-}
+  CODEX_TIMEOUT_MS: ${CODEX_TIMEOUT_MS:-900000}
+
+x-runtime: &runtime
+  restart: unless-stopped
+  init: true
+  user: "10001:10001"
+  read_only: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  pids_limit: 256
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=64m
+  stop_grace_period: 30s
+  environment: *app-environment
+  secrets:
+    - admin_password
+    - admin_session_secret
+  volumes:
+    - autopilot-data:/app/var
+  networks:
+    - autopilot
+
+services:
+  web:
+    <<: *runtime
+    image: ${AUTOPILOT_WEB_IMAGE:-autopilot-hq-web}:${AUTOPILOT_IMAGE_TAG:-local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+      args:
+        NEXT_PUBLIC_CHECKOUT_URL: ${NEXT_PUBLIC_CHECKOUT_URL:-}
+        NEXT_PUBLIC_DEFAULT_LOCALE: ${NEXT_PUBLIC_DEFAULT_LOCALE:-en}
+        NEXT_PUBLIC_DEMO_MODE: ${NEXT_PUBLIC_DEMO_MODE:-true}
+        NEXT_PUBLIC_OFFER_CURRENCY: ${NEXT_PUBLIC_OFFER_CURRENCY:-USD}
+        NEXT_PUBLIC_OFFER_SETUP_MINOR: ${NEXT_PUBLIC_OFFER_SETUP_MINOR:-65000}
+        NEXT_PUBLIC_OFFER_MONTHLY_MINOR: ${NEXT_PUBLIC_OFFER_MONTHLY_MINOR:-6500}
+    ports:
+      - "${AUTOPILOT_BIND_ADDRESS:-127.0.0.1}:${AUTOPILOT_PORT:-3000}:3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    mem_limit: 768m
+    cpus: 1.0
+
+  worker:
+    <<: *runtime
+    image: ${AUTOPILOT_WORKER_IMAGE:-autopilot-hq-worker}:${AUTOPILOT_IMAGE_TAG:-local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: worker
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "docker/healthcheck-worker.mjs"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    mem_limit: 1024m
+    cpus: 1.0
+
+  backup:
+    profiles: ["maintenance"]
+    image: ${AUTOPILOT_WORKER_IMAGE:-autopilot-hq-worker}:${AUTOPILOT_IMAGE_TAG:-local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: worker
+    init: true
+    user: "10001:10001"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    environment: *app-environment
+    secrets:
+      - admin_password
+      - admin_session_secret
+    volumes:
+      - autopilot-data:/app/var
+    networks:
+      - autopilot
+    command: ["node", "node_modules/tsx/dist/cli.mjs", "scripts/backup.ts"]
+    healthcheck:
+      disable: true
+    restart: "no"
+
+volumes:
+  autopilot-data:
+    name: ${AUTOPILOT_DATA_VOLUME:-autopilot-hq-data}
+
+networks:
+  autopilot:
+    name: ${AUTOPILOT_NETWORK:-autopilot-hq-network}
+    driver: bridge
+
+secrets:
+  admin_password:
+    file: ${AUTOPILOT_SECRETS_DIR:?Set AUTOPILOT_SECRETS_DIR to a directory outside the repository}/admin_password
+  admin_session_secret:
+    file: ${AUTOPILOT_SECRETS_DIR:?Set AUTOPILOT_SECRETS_DIR to a directory outside the repository}/admin_session_secret
