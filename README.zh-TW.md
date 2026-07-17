@@ -22,6 +22,8 @@
 ## 本機啟動
 
 ```powershell
+git clone https://github.com/mars-tw/morning-operator.git
+Set-Location morning-operator
 pnpm install
 Copy-Item .env.example .env.local
 pnpm seed

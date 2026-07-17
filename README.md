@@ -1,5 +1,9 @@
 # Morning Operator / 早安店長
 
+[![CI](https://github.com/mars-tw/morning-operator/actions/workflows/ci.yml/badge.svg)](https://github.com/mars-tw/morning-operator/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/mars-tw/morning-operator/actions/workflows/codeql.yml/badge.svg)](https://github.com/mars-tw/morning-operator/actions/workflows/codeql.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+
 **A multilingual, approval-gated automation service factory for repeatable business operations.**
 
 English · [繁體中文](README.zh-TW.md) · [日本語](docs/README.ja.md) · [Español](docs/README.es.md)
@@ -30,6 +34,8 @@ Each pack is a static, reviewable template with supported goals, an estimated au
 Requirements: Node.js 24+, pnpm 11+, and Git.
 
 ```powershell
+git clone https://github.com/mars-tw/morning-operator.git
+Set-Location morning-operator
 pnpm install
 Copy-Item .env.example .env.local
 pnpm seed

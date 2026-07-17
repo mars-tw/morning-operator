@@ -9,6 +9,8 @@
 静的でレビュー可能な 6 種類の業種パック（コマース運営、専門サービス、予約サービス、クリエイター／教育、不動産／現場サービス、バックオフィス）を収録しています。各パックには対応目標、推定自動化範囲、指標、承認ゲート、禁止用途があります。詳細は [業種パック仕様](industry-packs.md) を参照してください。
 
 ```powershell
+git clone https://github.com/mars-tw/morning-operator.git
+Set-Location morning-operator
 pnpm install
 Copy-Item .env.example .env.local
 pnpm seed

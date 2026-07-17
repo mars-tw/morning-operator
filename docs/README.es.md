@@ -9,6 +9,8 @@ La configuración predeterminada es una demo: no cobra, no envía emails reales,
 Incluye seis paquetes sectoriales estáticos y revisables: comercio, servicios profesionales, citas, creadores/educación, inmuebles/servicios de campo y operaciones administrativas. Cada paquete declara objetivos compatibles, rango estimado de automatización, métricas, aprobaciones y usos prohibidos. Consulta la [especificación de paquetes sectoriales](industry-packs.md).
 
 ```powershell
+git clone https://github.com/mars-tw/morning-operator.git
+Set-Location morning-operator
 pnpm install
 Copy-Item .env.example .env.local
 pnpm seed
