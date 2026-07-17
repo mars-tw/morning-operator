@@ -20,6 +20,27 @@ test("root negotiates English and every public locale is addressable", async ({ 
   }
 });
 
+test("website launch planner is localized and routes dynamic work to Workers", async ({ page }) => {
+  const headings = {
+    en: "Build the sales page first. Choose infrastructure second.",
+    "zh-TW": "先把銷售頁做好，再選最小可用的主機。",
+    ja: "まず販売ページを作り、次に最小限の基盤を選びます。",
+    es: "Primero crea la página de ventas. Después elige la infraestructura mínima."
+  };
+  for (const [locale, heading] of Object.entries(headings)) {
+    await page.goto(`/${locale}`);
+    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+  }
+
+  await page.goto("/en");
+  await page.getByLabel("Booking or server-backed site").check();
+  await expect(page.locator(".route-ticket")).toContainText("Cloudflare Workers");
+  await page.getByRole("link", { name: "Request this website" }).click();
+  await expect(page.locator('select[name="automationGoal"]')).toHaveValue("website_launch");
+  await expect(page.locator('select[name="siteType"]')).toHaveValue("service_booking");
+  await expect(page.locator('select[name="deploymentTarget"]')).toHaveValue("cloudflare_workers");
+});
+
 test("language switcher keeps the public page keyboard-addressable", async ({ page }) => {
   await page.goto("/en");
   await page.getByRole("link", { name: "日本語", exact: true }).click();

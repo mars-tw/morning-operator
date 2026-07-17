@@ -16,6 +16,7 @@ Small teams across many industries repeat the same reporting, lead follow-up, sc
 - Shareable locale URLs: `/en`, `/zh-TW`, `/ja`, and `/es`.
 - Human approval before AI build and before production delivery.
 - Six versioned industry packs: commerce operations, professional services, appointments, creator/education, property/field services, and back-office operations.
+- A multilingual website launch planner for portable sales, campaign, catalog, and booking sites with free-first Cloudflare, Firebase, GCP, and source-only routes.
 - Provider-neutral adapters for payments, email, monitoring, business platforms, and AI execution.
 - SQLite job queue with leases, retry backoff, dead-letter state, and audit records.
 - Docker self-hosting with separate web and worker services.
@@ -78,6 +79,8 @@ flowchart LR
 The full architecture is in [docs/architecture.md](docs/architecture.md), pack contract in [docs/industry-packs.md](docs/industry-packs.md), approval boundaries in [docs/approval-matrix.md](docs/approval-matrix.md), and the AI organization tree in [docs/organization-tree.md](docs/organization-tree.md).
 
 Payment integration is documented in [payment webhooks](docs/payment-webhooks.md) and the [Taiwan/open-source payment guide](docs/taiwan-payments.md). ECPay AIO checkout and signed callbacks are implemented; NewebPay, TapPay, and LINE Pay are explicitly documented-only until merchant credentials and server-side reconciliation tests exist.
+
+Generated sales and promotional websites use the [free-first deployment guide](docs/deployment.md). Cloudflare Pages is the static commercial default, Workers is the dynamic default, and GitHub is used for source and CI rather than GitHub Pages commercial hosting. Production publication still requires a recorded deployment approval.
 
 ## Configuration
 

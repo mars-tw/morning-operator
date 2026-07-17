@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createTranslator, type Locale, type MessageKey } from "@/i18n";
 import {
   industryPacks,
@@ -9,6 +9,16 @@ import {
   type IndustryPackId,
   type RiskTier
 } from "@/lib/industry-packs";
+import {
+  deploymentProviderIds,
+  getDeploymentCompatibility,
+  isDeploymentChoiceAllowed,
+  isDeploymentProviderId,
+  isSiteType,
+  recommendSiteDeployment,
+  type DeploymentProviderId,
+  type SiteType
+} from "@/lib/site-deployment";
 
 type Offer = {
   currency: string;
@@ -47,8 +57,25 @@ const goalKeys = {
   scheduling: "goal.scheduling",
   content_ops: "goal.content_ops",
   document_ops: "goal.document_ops",
-  operations_alerts: "goal.operations_alerts"
+  operations_alerts: "goal.operations_alerts",
+  website_launch: "goal.website_launch"
 } as const satisfies Record<AutomationGoal, MessageKey>;
+
+const siteTypeKeys = {
+  sales_landing: "site.type.sales_landing",
+  campaign: "site.type.campaign",
+  catalog: "site.type.catalog",
+  service_booking: "site.type.service_booking"
+} as const satisfies Record<Exclude<SiteType, "none">, MessageKey>;
+
+const providerNameKeys = {
+  source_only: "site.provider.source_only.name",
+  cloudflare_pages: "site.provider.cloudflare_pages.name",
+  cloudflare_workers: "site.provider.cloudflare_workers.name",
+  firebase_hosting: "site.provider.firebase_hosting.name",
+  gcp_cloud_run: "site.provider.gcp_cloud_run.name",
+  github_pages: "site.provider.github_pages.name"
+} as const satisfies Record<DeploymentProviderId, MessageKey>;
 
 function formatMoney(amountMinor: number, currency: string, fractionDigits: number, locale: Locale) {
   const amount = amountMinor / 10 ** fractionDigits;
@@ -65,13 +92,51 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
   const [loading, setLoading] = useState(false);
   const [packId, setPackId] = useState<IndustryPackId>("commerce_ops");
   const [goal, setGoal] = useState<AutomationGoal>(industryPacks.commerce_ops.goals[0]);
+  const [siteType, setSiteType] = useState<SiteType>("none");
+  const [deploymentTarget, setDeploymentTarget] = useState<DeploymentProviderId>("source_only");
   const t = createTranslator(locale);
   const hourlyCostDefault = offer.defaultHourlyCostMinor / 10 ** offer.fractionDigits;
 
   function changePack(nextPackId: IndustryPackId) {
     setPackId(nextPackId);
-    setGoal(industryPacks[nextPackId].goals[0]);
+    if (!(industryPacks[nextPackId].goals as readonly AutomationGoal[]).includes(goal)) {
+      changeGoal(industryPacks[nextPackId].goals[0]);
+    }
   }
+
+  function changeGoal(nextGoal: AutomationGoal) {
+    setGoal(nextGoal);
+    if (nextGoal === "website_launch") {
+      const nextSiteType = siteType === "none" ? "sales_landing" : siteType;
+      setSiteType(nextSiteType);
+      if (!isDeploymentChoiceAllowed(nextSiteType, deploymentTarget)) {
+        setDeploymentTarget(recommendSiteDeployment(nextSiteType));
+      }
+    } else {
+      setSiteType("none");
+      setDeploymentTarget("source_only");
+    }
+  }
+
+  function changeSiteType(nextSiteType: Exclude<SiteType, "none">) {
+    setSiteType(nextSiteType);
+    if (!isDeploymentChoiceAllowed(nextSiteType, deploymentTarget)) {
+      setDeploymentTarget(recommendSiteDeployment(nextSiteType));
+    }
+  }
+
+  useEffect(() => {
+    function receiveSiteSelection(event: Event) {
+      const detail = (event as CustomEvent<{ siteType?: unknown; deploymentTarget?: unknown }>).detail;
+      if (!isSiteType(detail?.siteType) || detail.siteType === "none" || !isDeploymentProviderId(detail.deploymentTarget)) return;
+      if (!isDeploymentChoiceAllowed(detail.siteType, detail.deploymentTarget)) return;
+      setGoal("website_launch");
+      setSiteType(detail.siteType);
+      setDeploymentTarget(detail.deploymentTarget);
+    }
+    window.addEventListener("morning-operator:site-selected", receiveSiteSelection);
+    return () => window.removeEventListener("morning-operator:site-selected", receiveSiteSelection);
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -88,6 +153,8 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
       industryPack: packId,
       primaryPlatform,
       automationGoal: goal,
+      siteType,
+      deploymentTarget,
       industry: form.get("industry"),
       usesShopify: primaryPlatform === "shopify",
       usesCurrentPlatform: form.get("usesCurrentPlatform") === "on",
@@ -158,7 +225,12 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
         <label className="wide">{t("audit.storeUrl")}<input name="storeUrl" type="url" placeholder="https://example.com" /></label>
         <label>{t("audit.industryPack")}<select name="industryPack" value={packId} onChange={(event) => changePack(event.target.value as IndustryPackId)}>{industryPackIds.map((id) => <option value={id} key={id}>{t(packNameKeys[id])}</option>)}</select></label>
         <label>{t("audit.primaryPlatform")}<select name="primaryPlatform" defaultValue="spreadsheet"><option value="shopify">{t("platform.shopify")}</option><option value="email">{t("platform.email")}</option><option value="spreadsheet">{t("platform.spreadsheet")}</option><option value="calendar">{t("platform.calendar")}</option><option value="crm">{t("platform.crm")}</option><option value="marketplace">{t("platform.marketplace")}</option><option value="website">{t("platform.website")}</option><option value="other">{t("platform.other")}</option></select></label>
-        <label>{t("audit.automationGoal")}<select name="automationGoal" value={goal} onChange={(event) => setGoal(event.target.value as AutomationGoal)}>{industryPacks[packId].goals.map((id) => <option value={id} key={id}>{t(goalKeys[id])}</option>)}</select></label>
+        <label>{t("audit.automationGoal")}<select name="automationGoal" value={goal} onChange={(event) => changeGoal(event.target.value as AutomationGoal)}>{industryPacks[packId].goals.map((id) => <option value={id} key={id}>{t(goalKeys[id])}</option>)}</select></label>
+        {goal === "website_launch" && <>
+          <label>{t("audit.siteType")}<select aria-describedby="site-launch-help" name="siteType" value={siteType} onChange={(event) => changeSiteType(event.target.value as Exclude<SiteType, "none">)}>{Object.entries(siteTypeKeys).map(([id, key]) => <option value={id} key={id}>{t(key)}</option>)}</select></label>
+          <label>{t("audit.deploymentTarget")}<select aria-describedby="site-launch-help" name="deploymentTarget" value={deploymentTarget} onChange={(event) => setDeploymentTarget(event.target.value as DeploymentProviderId)}>{deploymentProviderIds.map((id) => { const compatibility = getDeploymentCompatibility(siteType, id); const allowed = isDeploymentChoiceAllowed(siteType, id); return <option disabled={!allowed} value={id} key={id}>{t(providerNameKeys[id])} — {t(`site.compatibility.${compatibility}` as MessageKey)}</option>; })}</select></label>
+          <p className="wide site-form-help" id="site-launch-help">{t("audit.siteHelp")}</p>
+        </>}
         <label>{t("audit.industry")}<select name="industry" defaultValue="lifestyle"><option value="food">{t("audit.industry.food")}</option><option value="lifestyle">{t("audit.industry.lifestyle")}</option><option value="fashion">{t("audit.industry.fashion")}</option><option value="professional">{t("audit.industry.professional")}</option><option value="appointments">{t("audit.industry.appointments")}</option><option value="creator">{t("audit.industry.creator")}</option><option value="property">{t("audit.industry.property")}</option><option value="nonprofit">{t("audit.industry.nonprofit")}</option><option value="other">{t("audit.industry.other")}</option><option value="regulated">{t("audit.industry.regulated")}</option></select></label>
         <label>{t("audit.monthlyOrders")}<select name="monthlyOrders" defaultValue="100_500"><option value="under_100">{t("audit.orders.under100")}</option><option value="100_500">{t("audit.orders.100to500")}</option><option value="501_1500">{t("audit.orders.501to1500")}</option><option value="over_1500">{t("audit.orders.over1500")}</option></select></label>
         <label>{t("audit.teamSize")}<select name="teamSize" defaultValue="2_5"><option value="1">{t("audit.team.one")}</option><option value="2_5">{t("audit.team.small")}</option><option value="6_plus">{t("audit.team.large")}</option></select></label>

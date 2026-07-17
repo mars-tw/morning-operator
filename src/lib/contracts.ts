@@ -8,6 +8,11 @@ import {
   supportsAutomationGoal,
   type RiskTier
 } from "@/lib/industry-packs";
+import {
+  deploymentProviderIds,
+  isDeploymentChoiceAllowed,
+  siteTypes
+} from "@/lib/site-deployment";
 
 export const intakeSchema = z.object({
   locale: z.enum(supportedLocales).default("en"),
@@ -27,10 +32,26 @@ export const intakeSchema = z.object({
   biggestProblem: z.enum(["overdue", "refunds", "low_stock", "scattered_numbers", "data_entry", "lead_followup", "scheduling", "document_backlog", "content_reuse"]),
   requestedScope: z.enum(["read_only_report", "draft_and_review", "write_back", "multi_platform", "autonomous_external_action"]),
   implementationTiming: z.enum(["within_30_days", "one_to_three_months", "researching"]),
+  siteType: z.enum(siteTypes).default("none"),
+  deploymentTarget: z.enum(deploymentProviderIds).default("source_only"),
   hourlyCostMinor: z.number().int().min(0).max(10_000_000).default(0),
   privacyConsent: z.literal(true),
   marketingConsent: z.boolean().default(false),
   companyNote: z.string().trim().max(1000).default("")
+}).superRefine((input, context) => {
+  if (input.automationGoal === "website_launch" && input.siteType === "none") {
+    context.addIssue({ code: "custom", path: ["siteType"], message: "Website launch requires a site type" });
+  }
+  if (input.automationGoal !== "website_launch" && input.siteType !== "none") {
+    context.addIssue({ code: "custom", path: ["siteType"], message: "Site type requires the website launch goal" });
+  }
+  if (!isDeploymentChoiceAllowed(input.siteType, input.deploymentTarget)) {
+    context.addIssue({
+      code: "custom",
+      path: ["deploymentTarget"],
+      message: "Deployment target is not compatible with this commercial site type"
+    });
+  }
 });
 
 export type IntakeInput = z.output<typeof intakeSchema>;

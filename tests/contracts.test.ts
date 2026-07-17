@@ -12,6 +12,8 @@ const ideal = {
   industryPack: "commerce_ops" as const,
   primaryPlatform: "shopify" as const,
   automationGoal: "operations_alerts" as const,
+  siteType: "none" as const,
+  deploymentTarget: "source_only" as const,
   brandName: "測試品牌", email: "test@example.com", storeUrl: "https://example.com", industry: "lifestyle" as const,
   usesShopify: true, usesCurrentPlatform: true, monthlyOrders: "100_500" as const, teamSize: "2_5" as const, dailyMinutes: 45,
   weeklyReportMinutes: 90, biggestProblem: "low_stock" as const, requestedScope: "read_only_report" as const,
@@ -58,6 +60,8 @@ describe("lead scoring", () => {
       industryPack: _industryPack,
       primaryPlatform: _primaryPlatform,
       automationGoal: _automationGoal,
+      siteType: _siteType,
+      deploymentTarget: _deploymentTarget,
       usesCurrentPlatform: _usesCurrentPlatform,
       hourlyCostMinor: _hourlyCostMinor,
       ...legacy
@@ -66,8 +70,26 @@ describe("lead scoring", () => {
       industryPack: "commerce_ops",
       primaryPlatform: "shopify",
       automationGoal: "operations_alerts",
+      siteType: "none",
+      deploymentTarget: "source_only",
       usesCurrentPlatform: true,
       hourlyCostMinor: 0
     });
+  });
+  it("accepts compatible website launch targets and rejects commercial GitHub Pages", () => {
+    expect(intakeSchema.parse({
+      ...ideal,
+      primaryPlatform: "website",
+      automationGoal: "website_launch",
+      siteType: "sales_landing",
+      deploymentTarget: "cloudflare_pages"
+    })).toMatchObject({ siteType: "sales_landing", deploymentTarget: "cloudflare_pages" });
+
+    expect(() => intakeSchema.parse({
+      ...ideal,
+      automationGoal: "website_launch",
+      siteType: "sales_landing",
+      deploymentTarget: "github_pages"
+    })).toThrow(/not compatible/);
   });
 });

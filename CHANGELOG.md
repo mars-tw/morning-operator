@@ -4,6 +4,8 @@ All notable changes are documented here. This project follows semantic versionin
 
 ## Unreleased
 
+- Add a multilingual, approval-gated sales and promotional website launch planner with free-first Cloudflare Pages, Cloudflare Workers, Firebase Hosting, Google Cloud Run, GitHub source, and commercial GitHub Pages restrictions.
+
 ### Added
 
 - ECPay AIO hosted checkout, signed callbacks, fixed-price payment attempts, replay-safe project creation, and Taiwan payment-provider documentation.

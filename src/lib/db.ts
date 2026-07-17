@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS leads (
   industry_pack_version INTEGER NOT NULL DEFAULT 1,
   primary_platform TEXT NOT NULL DEFAULT 'shopify',
   automation_goal TEXT NOT NULL DEFAULT 'operations_alerts',
+  site_type TEXT NOT NULL DEFAULT 'none',
+  deployment_target TEXT NOT NULL DEFAULT 'source_only',
   brand_name TEXT NOT NULL,
   email TEXT NOT NULL,
   store_url TEXT NOT NULL,
@@ -172,6 +174,8 @@ export function getDb(): Database.Database {
     ensureColumn("leads", "industry_pack_version", "INTEGER NOT NULL DEFAULT 1");
     ensureColumn("leads", "primary_platform", "TEXT NOT NULL DEFAULT 'shopify'");
     ensureColumn("leads", "automation_goal", "TEXT NOT NULL DEFAULT 'operations_alerts'");
+    ensureColumn("leads", "site_type", "TEXT NOT NULL DEFAULT 'none'");
+    ensureColumn("leads", "deployment_target", "TEXT NOT NULL DEFAULT 'source_only'");
     ensureColumn("leads", "uses_current_platform", "INTEGER NOT NULL DEFAULT 1");
     ensureColumn("leads", "hourly_cost_minor", "INTEGER NOT NULL DEFAULT 0");
     ensureColumn("leads", "risk_tier", "TEXT NOT NULL DEFAULT 'low'");

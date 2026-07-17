@@ -24,6 +24,15 @@ import {
 } from "./industry-packs";
 import { assertProjectTransition } from "./project-machine";
 import { getPublicOffer } from "./public-config";
+import {
+  deploymentProviders,
+  getSiteRuntime,
+  isDeploymentChoiceAllowed,
+  isDeploymentProviderId,
+  isSiteType,
+  type DeploymentProviderId,
+  type SiteType
+} from "./site-deployment";
 
 const now = () => new Date().toISOString();
 const id = () => crypto.randomUUID();
@@ -35,6 +44,8 @@ export type LeadRow = {
   industry_pack_version: number;
   primary_platform: string;
   automation_goal: string;
+  site_type: SiteType;
+  deployment_target: DeploymentProviderId;
   brand_name: string;
   email: string;
   store_url: string;
@@ -154,13 +165,15 @@ export function createLead(rawInput: IntakeDraft): LeadRow {
   db.transaction(() => {
     db.prepare(
       `INSERT INTO leads (
-        id, locale, industry_pack, industry_pack_version, primary_platform, automation_goal, brand_name, email, store_url,
+        id, locale, industry_pack, industry_pack_version, primary_platform, automation_goal, site_type, deployment_target,
+        brand_name, email, store_url,
         industry, uses_shopify, uses_current_platform, monthly_orders, team_size, daily_minutes,
         weekly_report_minutes, biggest_problem, requested_scope, implementation_timing, hourly_cost_minor,
         privacy_consent, marketing_consent, company_note, score, estimated_monthly_hours, risk_tier,
         recoverable_hours_low, recoverable_hours_high, monthly_value_low, monthly_value_high, status, created_at
       ) VALUES (
-        @id, @locale, @industryPack, @industryPackVersion, @primaryPlatform, @automationGoal, @brandName, @email, @storeUrl,
+        @id, @locale, @industryPack, @industryPackVersion, @primaryPlatform, @automationGoal, @siteType, @deploymentTarget,
+        @brandName, @email, @storeUrl,
         @industry, @usesShopify, @usesCurrentPlatform, @monthlyOrders, @teamSize, @dailyMinutes,
         @weeklyReportMinutes, @biggestProblem, @requestedScope, @implementationTiming, @hourlyCostMinor,
         @privacyConsent, @marketingConsent, @companyNote, @score, @estimatedMonthlyHours, @riskTier,
@@ -173,6 +186,8 @@ export function createLead(rawInput: IntakeDraft): LeadRow {
       industryPackVersion: getIndustryPack(input.industryPack).version,
       primaryPlatform: input.primaryPlatform,
       automationGoal: input.automationGoal,
+      siteType: input.siteType,
+      deploymentTarget: input.deploymentTarget,
       brandName: input.brandName,
       email: input.email.toLowerCase(),
       storeUrl: input.storeUrl,
@@ -218,6 +233,8 @@ export function createLead(rawInput: IntakeDraft): LeadRow {
       locale: input.locale,
       industryPack: input.industryPack,
       automationGoal: input.automationGoal,
+      siteType: input.siteType,
+      deploymentTarget: input.deploymentTarget,
       riskTier: estimate.riskTier,
       recoverableHours: estimate.recoverableHours
     });
@@ -282,6 +299,13 @@ function automationEligibility(lead: LeadRow): { eligible: boolean; reason: stri
   if (!automationGoals.includes(lead.automation_goal as AutomationGoal)) return { eligible: false, reason: "unknown-goal" };
   if (!supportsAutomationGoal(lead.industry_pack, lead.automation_goal as AutomationGoal)) {
     return { eligible: false, reason: "unsupported-goal" };
+  }
+  if (!isSiteType(lead.site_type)) return { eligible: false, reason: "unknown-site-type" };
+  if (!isDeploymentProviderId(lead.deployment_target)) return { eligible: false, reason: "unknown-deployment-target" };
+  const websiteRequested = lead.automation_goal === "website_launch";
+  if (websiteRequested !== (lead.site_type !== "none")) return { eligible: false, reason: "website-goal-mismatch" };
+  if (!isDeploymentChoiceAllowed(lead.site_type, lead.deployment_target)) {
+    return { eligible: false, reason: "incompatible-deployment-target" };
   }
   return { eligible: true, reason: "eligible" };
 }
@@ -424,6 +448,7 @@ export function createSpecification(projectId: string): string {
   const db = getDb();
   const row = db.prepare(
     `SELECT p.*, l.brand_name, l.store_url, l.industry_pack, l.primary_platform, l.automation_goal,
+            l.site_type, l.deployment_target,
             l.monthly_orders, l.biggest_problem, l.requested_scope, l.risk_tier, l.company_note
        FROM projects p JOIN leads l ON l.id = p.lead_id WHERE p.id = ?`
   ).get(projectId) as (ProjectRow & LeadRow) | undefined;
@@ -432,7 +457,23 @@ export function createSpecification(projectId: string): string {
   assertProjectEligibleForAutomation(db, projectId);
 
   if (!isIndustryPackId(row.industry_pack)) throw new Error("Project requires manual review: unknown-pack");
+  if (!isSiteType(row.site_type) || !isDeploymentProviderId(row.deployment_target)) {
+    throw new Error("Project requires manual review: unknown website deployment selection");
+  }
   const pack = getIndustryPack(row.industry_pack);
+  const deployment = deploymentProviders[row.deployment_target];
+  const websiteRequirements = row.site_type === "none"
+    ? ["- Website deliverable: not requested"]
+    : [
+        `- Site type: ${row.site_type}`,
+        `- Runtime: ${getSiteRuntime(row.site_type)}`,
+        `- Deployment target: ${deployment.id}`,
+        `- Free allowance snapshot (${deployment.verifiedOn}): ${deployment.freeAllowance}`,
+        `- Provider documentation: ${deployment.officialDocumentation}`,
+        "- Keep the generated source portable and store it in a Git repository or source bundle.",
+        "- Use synthetic content and placeholders until the owner approves real brand content and publication.",
+        "- Production publication, DNS changes, analytics, forms, and payment links require separate owner review."
+      ];
   const spec = [
     `# ${sanitizeCustomerText(row.brand_name, 80)} | Morning Operator delivery specification`,
     "",
@@ -444,6 +485,9 @@ export function createSpecification(projectId: string): string {
     `- Automation goal: ${sanitizeCustomerText(row.automation_goal, 80)}`,
     `- Monthly work volume: ${row.monthly_orders}`,
     `- Scope: ${row.requested_scope}`,
+    "",
+    "## Website launch requirements",
+    ...websiteRequirements,
     "",
     "## Primary problem",
     `- ${row.biggest_problem}`,
@@ -652,15 +696,19 @@ export function markQa(projectId: string, passed: boolean, evidence: string): vo
   db.transaction(() => {
     const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(projectId) as ProjectRow;
     const qaState: ProjectState = passed ? "qa_passed" : "qa_failed";
-    assertProjectTransition(project.state, qaState);
+    const revalidatingRejectedDeployment = passed && project.state === "qa_passed";
+    if (!revalidatingRejectedDeployment) assertProjectTransition(project.state, qaState);
     db.prepare("UPDATE projects SET state = ?, updated_at = ? WHERE id = ?").run(qaState, now(), projectId);
     if (passed) {
       assertProjectTransition("qa_passed", "deploy_approval");
       db.prepare("UPDATE projects SET state = 'deploy_approval', updated_at = ? WHERE id = ?").run(now(), projectId);
       db.prepare(
-        `INSERT OR IGNORE INTO approvals
+        `INSERT INTO approvals
           (id, project_id, kind, status, summary, created_at)
-         VALUES (?, ?, 'deployment', 'pending', ?, ?)`
+         VALUES (?, ?, 'deployment', 'pending', ?, ?)
+         ON CONFLICT(project_id, kind) DO UPDATE SET
+           status = 'pending', summary = excluded.summary, created_at = excluded.created_at,
+           decided_at = NULL, decision_note = NULL`
       ).run(id(), projectId, evidence, now());
     }
     audit(db, "worker", passed ? "qa.passed" : "qa.failed", "project", projectId, { evidence });

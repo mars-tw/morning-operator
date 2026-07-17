@@ -15,7 +15,8 @@ export const automationGoals = [
   "scheduling",
   "content_ops",
   "document_ops",
-  "operations_alerts"
+  "operations_alerts",
+  "website_launch"
 ] as const;
 
 export type AutomationGoal = (typeof automationGoals)[number];
@@ -39,7 +40,7 @@ export const industryPacks = {
     version: 1,
     riskTier: "low",
     coverage: { low: 0.35, high: 0.6 },
-    goals: ["reporting", "lead_followup", "document_ops", "operations_alerts"],
+    goals: ["reporting", "lead_followup", "document_ops", "operations_alerts", "website_launch"],
     metrics: ["work_items_processed", "late_item_rate", "exception_rate", "manual_interventions"],
     requiredApprovals: ["data_access", "workflow_scope", "production_delivery"],
     prohibitedActions: ["automatic_refunds", "payment_changes", "unreviewed_order_changes", "customer_pii_to_ai"],
@@ -50,7 +51,7 @@ export const industryPacks = {
     version: 1,
     riskTier: "medium",
     coverage: { low: 0.25, high: 0.5 },
-    goals: ["reporting", "lead_followup", "document_ops"],
+    goals: ["reporting", "lead_followup", "document_ops", "website_launch"],
     metrics: ["inquiries_triaged", "draft_turnaround", "approval_rate", "manual_interventions"],
     requiredApprovals: ["data_access", "outbound_message", "deliverable_release"],
     prohibitedActions: ["legal_or_financial_advice", "unreviewed_client_commitments", "eligibility_decisions", "confidential_data_to_ai"],
@@ -61,7 +62,7 @@ export const industryPacks = {
     version: 1,
     riskTier: "medium",
     coverage: { low: 0.3, high: 0.55 },
-    goals: ["reporting", "lead_followup", "scheduling", "operations_alerts"],
+    goals: ["reporting", "lead_followup", "scheduling", "operations_alerts", "website_launch"],
     metrics: ["requests_triaged", "response_time", "no_show_followups", "manual_interventions"],
     requiredApprovals: ["calendar_access", "message_template", "outbound_message"],
     prohibitedActions: ["medical_triage", "emergency_routing", "unreviewed_booking_commitments", "sensitive_notes_to_ai"],
@@ -72,7 +73,7 @@ export const industryPacks = {
     version: 1,
     riskTier: "low",
     coverage: { low: 0.35, high: 0.65 },
-    goals: ["reporting", "lead_followup", "content_ops", "document_ops"],
+    goals: ["reporting", "lead_followup", "content_ops", "document_ops", "website_launch"],
     metrics: ["assets_drafted", "review_cycle_time", "reuse_rate", "manual_interventions"],
     requiredApprovals: ["source_material", "brand_voice", "publication"],
     prohibitedActions: ["plagiarism", "unreviewed_publication", "fabricated_claims", "learner_pii_to_ai"],
@@ -83,7 +84,7 @@ export const industryPacks = {
     version: 1,
     riskTier: "medium",
     coverage: { low: 0.25, high: 0.5 },
-    goals: ["reporting", "lead_followup", "scheduling", "document_ops", "operations_alerts"],
+    goals: ["reporting", "lead_followup", "scheduling", "document_ops", "operations_alerts", "website_launch"],
     metrics: ["requests_triaged", "jobs_scheduled", "document_turnaround", "manual_interventions"],
     requiredApprovals: ["record_access", "schedule_commitment", "outbound_message"],
     prohibitedActions: ["housing_eligibility", "tenant_scoring", "safety_certification", "unreviewed_contract_changes"],
@@ -94,7 +95,7 @@ export const industryPacks = {
     version: 1,
     riskTier: "low",
     coverage: { low: 0.3, high: 0.6 },
-    goals: ["reporting", "lead_followup", "document_ops", "operations_alerts"],
+    goals: ["reporting", "lead_followup", "document_ops", "operations_alerts", "website_launch"],
     metrics: ["records_processed", "exception_rate", "cycle_time", "manual_interventions"],
     requiredApprovals: ["data_access", "workflow_scope", "external_action"],
     prohibitedActions: ["payroll_changes", "employment_decisions", "bank_transfers", "unreviewed_record_deletion"],

@@ -20,6 +20,8 @@ SQLite 啟用 WAL、foreign keys 與 busy timeout。付款事件、專案與工�
 
 系統不將公開表單的「產業」視為可執行指令。邊界驗證只接受內建 registry 中的產業包 ID 與支援目標，再將結構化輸入作為不可信任資料寫入 SQLite。產業包提供的是靜態、版本化且可審閱的工作流程合約；詳見 [產業包文件](industry-packs.md)。
 
+網站開發需求同樣經過靜態 registry：`site_type` 決定靜態或動態 runtime，`deployment_target` 只接受已知供應商 ID，商業站不可選 GitHub Pages，動態站不可選純靜態主機。資料庫只保存選擇，不保存主機憑證；建置規格批准後才交給隔離 workspace，正式發佈仍需 deployment approval。詳見 [免費優先發佈](deployment.md)。
+
 ```mermaid
 flowchart LR
     Input["工作量、平台、目標與成本"] --> Validate["Zod 邊界驗證"]
