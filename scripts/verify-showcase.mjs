@@ -63,7 +63,8 @@ if (!failures.length) {
     }
   }
   if (!notFound.includes('content="noindex,follow"')) failures.push("404 page must be noindex");
-  if (!sitemap.includes("https://mars-tw.github.io/morning-operator/")) failures.push("sitemap must use the canonical URL");
+  const sitemapLocation = sitemap.match(/<loc>([^<]+)<\/loc>/)?.[1];
+  if (sitemapLocation !== "https://mars-tw.github.io/morning-operator/") failures.push("sitemap must use the canonical URL");
   if (!css.includes(":focus-visible") || !css.includes("prefers-reduced-motion")) {
     failures.push("missing focus or reduced-motion support");
   }
