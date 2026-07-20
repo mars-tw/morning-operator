@@ -18,6 +18,8 @@ SQLite 啟用 WAL、foreign keys 與 busy timeout。付款事件、專案與工�
 
 ## 多產業接入
 
+五種版本化專案配方位於產業包之上，將團購、授權 IT 監控、製造異常、社群活動與私人家計等具體入口映射回既有六包。公開啟動台只把非 PII 證據送往無持久化 readiness API；它不能建立付款、專案、工作、核准或外部動作。詳見 [專案配方與商用就緒度](project-recipes.md)。
+
 系統不將公開表單的「產業」視為可執行指令。邊界驗證只接受內建 registry 中的產業包 ID 與支援目標，再將結構化輸入作為不可信任資料寫入 SQLite。產業包提供的是靜態、版本化且可審閱的工作流程合約；詳見 [產業包文件](industry-packs.md)。
 
 網站開發需求同樣經過靜態 registry：`site_type` 決定靜態或動態 runtime，`deployment_target` 只接受已知供應商 ID，商業站不可選 GitHub Pages，動態站不可選純靜態主機。資料庫只保存選擇，不保存主機憑證；建置規格批准後才交給隔離 workspace，正式發佈仍需 deployment approval。詳見 [免費優先發佈](deployment.md)。

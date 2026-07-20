@@ -5,6 +5,7 @@ All notable changes are documented here. This project follows semantic versionin
 ## Unreleased
 
 - Add a multilingual, approval-gated sales and promotional website launch planner with free-first Cloudflare Pages, Cloudflare Workers, Firebase Hosting, Google Cloud Run, GitHub source, and commercial GitHub Pages restrictions.
+- Add five versioned project recipes, a four-dimensional commercial-readiness engine, and a multilingual no-persistence project setup optimizer with P0/P1/P2 improvement queues.
 
 ### Added
 

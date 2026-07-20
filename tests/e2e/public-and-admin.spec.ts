@@ -41,6 +41,27 @@ test("website launch planner is localized and routes dynamic work to Workers", a
   await expect(page.locator('select[name="deploymentTarget"]')).toHaveValue("cloudflare_workers");
 });
 
+test("project optimizer turns verified evidence into a safe intake preset", async ({ page }) => {
+  await page.goto("/en");
+  await expect(page.getByRole("heading", { name: "Configure the project. Prove it can operate." })).toBeVisible();
+  await page.getByLabel("Core workflow").selectOption("end_to_end");
+  await page.getByLabel("Data protection").selectOption("protected");
+  await page.getByLabel("Writes and retries").selectOption("resilient");
+  await page.getByLabel("Payment evidence").selectOption("verified");
+  await page.getByLabel("Automated verification").selectOption("full");
+  await page.getByLabel("Deployment proof").selectOption("production");
+  await page.getByLabel("Buyer evidence").selectOption("repeatable");
+  await page.getByRole("button", { name: "Run readiness check" }).click();
+
+  await expect(page.getByRole("heading", { name: "Commercial go" })).toBeVisible();
+  await expect(page.locator(".readiness-scores")).toContainText("100%");
+  await expect(page.getByText("Scores are evidence-based scenarios. They do not guarantee income, savings, demand, or commercial success.")).toBeVisible();
+
+  await page.getByRole("link", { name: "Use this recipe in the free audit" }).click();
+  await expect(page.locator('select[name="industryPack"]')).toHaveValue("commerce_ops");
+  await expect(page.locator('select[name="automationGoal"]')).toHaveValue("reporting");
+});
+
 test("language switcher keeps the public page keyboard-addressable", async ({ page }) => {
   await page.goto("/en");
   await page.getByRole("link", { name: "日本語", exact: true }).click();

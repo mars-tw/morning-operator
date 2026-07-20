@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LeadForm } from "@/components/lead-form";
+import { ProjectSetupOptimizer } from "@/components/project-setup-optimizer";
 import { SiteLaunchPlanner } from "@/components/site-launch-planner";
 import {
   createTranslator,
@@ -65,6 +66,7 @@ export default async function LocalizedHomePage({ params }: PageProps) {
         <a className="wordmark" href={`/${locale}#top`}>{t("brand.name")}</a>
         <div className="nav-links">
           <a href="#industries">{t("nav.industries")}</a>
+          <a href="#project-setup">{t("nav.projects")}</a>
           <a href="#site-launch">{t("nav.sites")}</a>
           <a href="#offer">{t("nav.offer")}</a>
           <a href="#audit">{t("nav.audit")}</a>
@@ -135,6 +137,8 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           })}
         </div>
       </section>
+
+      <ProjectSetupOptimizer locale={locale} />
 
       <SiteLaunchPlanner locale={locale} />
 

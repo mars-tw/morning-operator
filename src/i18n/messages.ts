@@ -2,7 +2,7 @@ import type { Locale } from "./locales";
 
 const industryCopy = {
   en: {
-    "nav.industries": "Industries", "nav.sites": "Website launch",
+    "nav.industries": "Industries", "nav.projects": "Project setup", "nav.sites": "Website launch",
     "pack.eyebrow": "Reusable automation blueprints",
     "pack.title": "Choose the work pattern that looks most like your week.",
     "pack.description": "Each pack defines safe inputs, measurable outcomes, required approvals, and actions the system must never take.",
@@ -54,7 +54,7 @@ const industryCopy = {
     "estimate.disclaimer": "Estimate based on supplied inputs and pack coverage; results, savings, and income are not guaranteed."
   },
   "zh-TW": {
-    "nav.industries": "產業方案", "nav.sites": "網站發佈",
+    "nav.industries": "產業方案", "nav.projects": "專案設定", "nav.sites": "網站發佈",
     "pack.eyebrow": "可重複使用的自動化藍圖",
     "pack.title": "選出最像你每週工作的流程。",
     "pack.description": "每個產業包都定義安全輸入、可量測成果、必要核准與系統絕不能執行的動作。",
@@ -106,7 +106,7 @@ const industryCopy = {
     "estimate.disclaimer": "依填答與產業包覆蓋率估算；成果、節省與收入都不保證。"
   },
   ja: {
-    "nav.industries": "業種別プラン", "nav.sites": "サイト公開",
+    "nav.industries": "業種別プラン", "nav.projects": "プロジェクト設定", "nav.sites": "サイト公開",
     "pack.eyebrow": "再利用できる自動化設計",
     "pack.title": "毎週の仕事に最も近い流れを選びます。",
     "pack.description": "各パックは安全な入力、測定可能な成果、必要な承認、禁止操作を定義します。",
@@ -151,7 +151,7 @@ const industryCopy = {
     "estimate.disclaimer": "入力値とパック範囲による推定です。成果、削減、収入は保証されません。"
   },
   es: {
-    "nav.industries": "Sectores", "nav.sites": "Publicar sitio",
+    "nav.industries": "Sectores", "nav.projects": "Configurar proyecto", "nav.sites": "Publicar sitio",
     "pack.eyebrow": "Planos de automatización reutilizables",
     "pack.title": "Elige el patrón que más se parece a tu semana.",
     "pack.description": "Cada paquete define entradas seguras, resultados medibles, aprobaciones y acciones prohibidas.",
