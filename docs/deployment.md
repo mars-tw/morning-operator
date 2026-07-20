@@ -2,6 +2,8 @@
 
 本文件處理 Morning Operator 為客戶產生的獨立銷售頁、活動頁、商品／服務型錄與預約網站。它不代表本專案主程式適合直接搬到任何靜態主機；Morning Operator 本身仍包含 SQLite、背景 worker、付款 Webhook 與管理後台，完整自架方式請看 [`self-hosting.md`](self-hosting.md)。
 
+想先看完全不接金流、個資或後端的互動作品，可開啟[免費四專案展示](https://mars-tw.github.io/morning-operator/)並閱讀[預覽中心研究與改作方式](free-preview-gallery.md)。GitHub Pages 只承載這個開源程式作品展示，不承載客戶的真實商業站、電商或 SaaS。
+
 免費額度查核日：**2026-07-17**。供應商可以隨時調整方案；上線前必須再檢查官方價格、流量、商業使用、資料區域與帳務設定。免費主機不包含付費網域、Email、第三方表單、資料庫、金流手續費或超額流量。
 
 ## 預設選擇

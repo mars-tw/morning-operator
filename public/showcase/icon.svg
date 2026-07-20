@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Morning Operator preview lab">
+  <rect width="64" height="64" rx="8" fill="#10243d"/>
+  <rect x="10" y="10" width="19" height="19" fill="#f5d84d"/>
+  <rect x="35" y="10" width="19" height="19" fill="#9fe8dc"/>
+  <rect x="10" y="35" width="19" height="19" fill="#9fe8dc"/>
+  <rect x="35" y="35" width="19" height="19" fill="#ff826c"/>
+</svg>

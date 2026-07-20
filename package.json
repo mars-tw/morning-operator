@@ -32,8 +32,9 @@
     "backup": "tsx scripts/backup.ts",
     "restore-check": "tsx scripts/restore-check.ts",
     "security:secrets": "tsx scripts/secret-scan.ts",
+    "showcase:verify": "node scripts/verify-showcase.mjs",
     "validate:env": "node scripts/validate-env.mjs",
-    "verify": "pnpm security:secrets && pnpm typecheck && pnpm test && pnpm build && pnpm smoke && pnpm restore-check"
+    "verify": "pnpm security:secrets && pnpm showcase:verify && pnpm typecheck && pnpm test && pnpm build && pnpm smoke && pnpm restore-check"
   },
   "dependencies": {
     "better-sqlite3": "12.11.1",

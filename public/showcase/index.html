@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Four open-source, synthetic project previews for learning, evaluation, and remixing.">
+    <meta name="color-scheme" content="light">
+    <title>Morning Operator — Open Project Preview Lab</title>
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#projects" data-i18n="access.skip">Skip to projects</a>
+
+    <header class="lab-header">
+      <a class="lab-mark" href="#top" aria-label="Morning Operator preview lab home">
+        <span class="mark-grid" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span><strong>MORNING OPERATOR</strong><small>OPEN PREVIEW LAB / 01</small></span>
+      </a>
+      <nav class="language-switcher" aria-label="Language">
+        <button type="button" data-locale="en" aria-pressed="true">EN</button>
+        <button type="button" data-locale="zh-TW" aria-pressed="false">繁中</button>
+        <button type="button" data-locale="ja" aria-pressed="false">日本語</button>
+        <button type="button" data-locale="es" aria-pressed="false">ES</button>
+      </nav>
+    </header>
+
+    <div class="preview-banner" role="note">
+      <strong data-i18n="preview.badge">OPEN-SOURCE PREVIEW</strong>
+      <span data-i18n="preview.notice">Synthetic data only. No payment, booking, message, account, or personal data is created here.</span>
+    </div>
+
+    <main id="top">
+      <section class="lab-hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="kicker" data-i18n="hero.kicker">A project sample wall for people who build</p>
+          <h1 id="hero-title" data-i18n="hero.title">Study the plan.<br>Touch the prototype.<br>Remix the source.</h1>
+          <p class="hero-lede" data-i18n="hero.description">Four small, fixed-scope concepts show what can be previewed for free before anyone connects a domain, customer record, payment provider, or production system.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#projects" data-i18n="hero.primary">Explore four plans</a>
+            <a class="button button-quiet" href="https://github.com/mars-tw/morning-operator" rel="noreferrer" data-i18n="hero.source">View source on GitHub</a>
+          </div>
+        </div>
+        <aside class="hero-specimen" aria-label="Preview lab principles">
+          <div class="specimen-label"><span>PUBLIC SAMPLE</span><b>v1.0</b></div>
+          <div class="specimen-orbit" aria-hidden="true">
+            <span class="orbit-core">4</span>
+            <i class="orbit-one"></i>
+            <i class="orbit-two"></i>
+          </div>
+          <dl>
+            <div><dt data-i18n="hero.ruleOneLabel">Data</dt><dd data-i18n="hero.ruleOne">Synthetic only</dd></div>
+            <div><dt data-i18n="hero.ruleTwoLabel">Actions</dt><dd data-i18n="hero.ruleTwo">Local simulation</dd></div>
+            <div><dt data-i18n="hero.ruleThreeLabel">License</dt><dd>Apache-2.0</dd></div>
+          </dl>
+        </aside>
+      </section>
+
+      <section class="project-index" id="projects" aria-labelledby="projects-title">
+        <div class="section-heading">
+          <p class="kicker" data-i18n="projects.kicker">Four viable starting points</p>
+          <h2 id="projects-title" data-i18n="projects.title">Choose a project card</h2>
+          <p data-i18n="projects.description">Each card has one audience, one job, a bounded deliverable, a free preview path, and clear human gates.</p>
+        </div>
+        <div class="project-tabs" id="project-tabs" role="group" aria-label="Project examples"></div>
+      </section>
+
+      <section class="workbench" aria-labelledby="workbench-title">
+        <div class="workbench-head">
+          <div>
+            <p class="kicker" data-i18n="workbench.kicker">Live sample bench</p>
+            <h2 id="workbench-title" data-i18n="workbench.title">A prototype beside its operating plan</h2>
+          </div>
+          <div class="simulation-key"><span></span><b data-i18n="workbench.key">Local simulation — no external action</b></div>
+        </div>
+
+        <div class="workbench-grid">
+          <article class="demo-shell" aria-labelledby="demo-title">
+            <div class="demo-toolbar">
+              <span id="demo-code">PX-01</span>
+              <strong id="demo-title">Web design studio</strong>
+              <span class="demo-status" data-i18n="workbench.status">PREVIEW</span>
+            </div>
+            <div class="demo-controls" id="demo-controls" aria-label="Preview controls"></div>
+            <div class="demo-stage" id="demo-stage" aria-live="polite"></div>
+            <p class="demo-disclaimer" id="demo-disclaimer" data-i18n="workbench.disclaimer">This interaction changes only the pixels on this page. Nothing is submitted, saved, booked, purchased, or sent.</p>
+          </article>
+
+          <aside class="plan-sheet" aria-labelledby="plan-title">
+            <div class="sheet-registration"><span id="plan-code">PX-01</span><b data-i18n="plan.version">VERSION 1</b></div>
+            <p class="kicker" data-i18n="plan.kicker">Execution blueprint</p>
+            <h3 id="plan-title">Web design studio</h3>
+            <p class="plan-summary" id="plan-summary"></p>
+            <dl class="plan-facts">
+              <div><dt data-i18n="plan.audience">Audience</dt><dd id="plan-audience"></dd></div>
+              <div><dt data-i18n="plan.job">Single job</dt><dd id="plan-job"></dd></div>
+              <div><dt data-i18n="plan.host">Free preview host</dt><dd id="plan-host"></dd></div>
+              <div><dt data-i18n="plan.duration">Prototype window</dt><dd id="plan-duration"></dd></div>
+              <div><dt data-i18n="plan.coverage">Automation scenario</dt><dd id="plan-coverage"></dd></div>
+            </dl>
+            <div class="plan-list">
+              <h4 data-i18n="plan.deliverables">Fixed deliverables</h4>
+              <ul id="plan-deliverables"></ul>
+            </div>
+            <div class="plan-list gate-list">
+              <h4 data-i18n="plan.gates">Human gates</h4>
+              <ul id="plan-gates"></ul>
+            </div>
+            <div class="scenario-note">
+              <strong data-i18n="plan.scenario">Monetization scenario</strong>
+              <p id="plan-scenario"></p>
+              <small data-i18n="plan.noGuarantee">Scenario only; income, demand, savings, and success are not guaranteed.</small>
+            </div>
+            <button class="button button-download" id="download-brief" type="button" data-i18n="plan.download">Download this non-PII brief</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="hosting-board" aria-labelledby="hosting-title">
+        <div class="section-heading">
+          <p class="kicker" data-i18n="hosting.kicker">Free-first publication routes</p>
+          <h2 id="hosting-title" data-i18n="hosting.title">Use the preview host for the right job</h2>
+          <p data-i18n="hosting.description">This gallery uses GitHub Pages as a code-project showcase. A real business site needs a host whose terms and runtime match the work.</p>
+        </div>
+        <div class="hosting-grid">
+          <article>
+            <span class="host-tag host-current" data-i18n="hosting.current">THIS SHOWCASE</span>
+            <h3>GitHub Pages</h3>
+            <p data-i18n="hosting.github">Good for an open-source project showcase with no data collection or transactions. Not for running an online business, e-commerce, or SaaS.</p>
+            <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits" rel="noreferrer" data-i18n="hosting.official">Official limits</a>
+          </article>
+          <article>
+            <span class="host-tag" data-i18n="hosting.static">COMMERCIAL STATIC</span>
+            <h3>Cloudflare Pages</h3>
+            <p data-i18n="hosting.cloudflare">A practical free-first route for a reviewed commercial landing page or catalog that uses hosted checkout and no front-end secrets.</p>
+            <a href="https://developers.cloudflare.com/pages/platform/limits/" rel="noreferrer" data-i18n="hosting.official">Official limits</a>
+          </article>
+          <article>
+            <span class="host-tag" data-i18n="hosting.dynamic">REVIEWED DYNAMIC</span>
+            <h3>Cloudflare Workers</h3>
+            <p data-i18n="hosting.workers">Use when server-side validation or a small API is required. Secrets, writes, retries, and production deployment still need review.</p>
+            <a href="https://developers.cloudflare.com/workers/platform/limits/" rel="noreferrer" data-i18n="hosting.official">Official limits</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="remix-callout" aria-labelledby="remix-title">
+        <div>
+          <p class="kicker" data-i18n="remix.kicker">From sample to owned project</p>
+          <h2 id="remix-title" data-i18n="remix.title">Fork the source, replace the synthetic copy, then review every production boundary.</h2>
+        </div>
+        <ol>
+          <li><span>01</span><p data-i18n="remix.one">Choose one fixed job and one measurable outcome.</p></li>
+          <li><span>02</span><p data-i18n="remix.two">Keep the first preview static and free of personal data.</p></li>
+          <li><span>03</span><p data-i18n="remix.three">Add providers only after privacy, payment, and deployment review.</p></li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="lab-footer">
+      <p><strong>Morning Operator</strong> · <span data-i18n="footer.line">Open source under Apache-2.0. Built as an educational project showcase.</span></p>
+      <a href="https://github.com/mars-tw/morning-operator" rel="noreferrer" data-i18n="footer.source">Source and documentation</a>
+    </footer>
+  </body>
+</html>

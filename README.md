@@ -8,6 +8,8 @@
 
 English · [繁體中文](README.zh-TW.md) · [日本語](docs/README.ja.md) · [Español](docs/README.es.md)
 
+**Free interactive preview:** [Open the four-project showcase](https://mars-tw.github.io/morning-operator/) · [Read the implementation and hosting guide](docs/free-preview-gallery.md)
+
 Morning Operator turns a public workflow audit into a controlled service-delivery pipeline: industry-pack selection, fit scoring, signed payment events, scope approval, isolated AI-assisted build, QA, delivery approval, notification, audit log, and backup. It is open source under Apache-2.0, provider-neutral, and designed to be self-hosted.
 
 > The default configuration is a demo. It does not collect real payments, send real email, connect to external platforms, or deploy generated work. Revenue, payback, and time-saved figures are estimates, never guarantees. No industry pack guarantees that a business or user will make money.
@@ -21,6 +23,7 @@ Small teams across many industries repeat the same reporting, lead follow-up, sc
 - Human approval before AI build and before production delivery.
 - Six versioned industry packs: commerce operations, professional services, appointments, creator/education, property/field services, and back-office operations.
 - A multilingual website launch planner for portable sales, campaign, catalog, and booking sites with free-first Cloudflare, Firebase, GCP, and source-only routes.
+- A dependency-free, four-locale open-source preview gallery for web design, appointments, creator products, and group-buy operations using synthetic data only.
 - Provider-neutral adapters for payments, email, monitoring, business platforms, and AI execution.
 - SQLite job queue with leases, retry backoff, dead-letter state, and audit records.
 - Docker self-hosting with separate web and worker services.
@@ -111,7 +114,7 @@ pnpm verify
 pnpm test:e2e
 ```
 
-`pnpm verify` runs the secret scan, typecheck, unit tests, production build, end-to-end workflow smoke test, and backup restore integrity check. Container builds are also required by CI because the current Windows development host may not have a Docker engine.
+`pnpm verify` runs the secret scan, static showcase verifier, typecheck, unit tests, production build, end-to-end workflow smoke test, and backup restore integrity check. Container builds are also required by CI because the current Windows development host may not have a Docker engine.
 
 ## Project status
 
