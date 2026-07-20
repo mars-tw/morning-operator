@@ -4,7 +4,7 @@ All notable changes are documented here. This project follows semantic versionin
 
 ## Unreleased
 
-- Make SEO a core fixed-scope service with a six-recipe registry, persisted recipe selection, multilingual homepage treatment, technical metadata routes, truthful structured data, and a no-data interactive SEO growth lab.
+- Make SEO a core fixed-scope service with a six-recipe registry, persisted recipe selection, multilingual homepage treatment, technical metadata routes, truthful structured data, exact sitemap-origin verification, and a no-data interactive SEO growth lab.
 - Add a dependency-free, four-locale open project preview gallery with web design, appointment, creator-product, and group-buy examples; publish it through a guarded GitHub Pages workflow using synthetic data only.
 - Add a multilingual, approval-gated sales and promotional website launch planner with free-first Cloudflare Pages, Cloudflare Workers, Firebase Hosting, Google Cloud Run, GitHub source, and commercial GitHub Pages restrictions.
 - Add five versioned project recipes, a four-dimensional commercial-readiness engine, and a multilingual no-persistence project setup optimizer with P0/P1/P2 improvement queues.
