@@ -138,6 +138,22 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
     return () => window.removeEventListener("morning-operator:site-selected", receiveSiteSelection);
   }, []);
 
+  useEffect(() => {
+    function receiveRecipeSelection(event: Event) {
+      const detail = (event as CustomEvent<{ packId?: unknown; goal?: unknown }>).detail;
+      if (typeof detail?.packId !== "string" || typeof detail.goal !== "string") return;
+      if (!(industryPackIds as readonly string[]).includes(detail.packId)) return;
+      const nextPackId = detail.packId as IndustryPackId;
+      if (!(industryPacks[nextPackId].goals as readonly string[]).includes(detail.goal)) return;
+      setPackId(nextPackId);
+      setGoal(detail.goal as AutomationGoal);
+      setSiteType("none");
+      setDeploymentTarget("source_only");
+    }
+    window.addEventListener("morning-operator:recipe-selected", receiveRecipeSelection);
+    return () => window.removeEventListener("morning-operator:recipe-selected", receiveRecipeSelection);
+  }, []);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);

@@ -66,6 +66,8 @@ The Compose setup uses a persistent SQLite volume, non-root containers, read-onl
 
 ## Workflow
 
+Learners can start with the multilingual project setup optimizer, select one of five reviewed recipes, and preview assignment execution, commercial delivery, market, and monetization readiness without storing customer data. See [project recipes and readiness](docs/project-recipes.md). Scores and revenue scenarios are estimates, never guarantees.
+
 ```mermaid
 flowchart LR
     Visitor["Localized workflow audit"] --> Pack["Static industry pack"]
