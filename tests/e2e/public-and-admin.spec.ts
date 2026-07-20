@@ -41,7 +41,7 @@ test("website launch planner is localized and routes dynamic work to Workers", a
   await expect(page.locator('select[name="deploymentTarget"]')).toHaveValue("cloudflare_workers");
 });
 
-test("project optimizer turns verified evidence into a safe intake preset", async ({ page }) => {
+test("project optimizer turns verified SEO evidence into a safe intake preset", async ({ page }) => {
   await page.goto("/en");
   await expect(page.getByRole("heading", { name: "Configure the project. Prove it can operate." })).toBeVisible();
   await page.getByLabel("Core workflow").selectOption("end_to_end");
@@ -58,8 +58,10 @@ test("project optimizer turns verified evidence into a safe intake preset", asyn
   await expect(page.getByText("Scores are evidence-based scenarios. They do not guarantee income, savings, demand, or commercial success.")).toBeVisible();
 
   await page.getByRole("link", { name: "Use this recipe in the free audit" }).click();
-  await expect(page.locator('select[name="industryPack"]')).toHaveValue("commerce_ops");
-  await expect(page.locator('select[name="automationGoal"]')).toHaveValue("reporting");
+  await expect(page.locator('select[name="industryPack"]')).toHaveValue("professional_services");
+  await expect(page.locator('select[name="automationGoal"]')).toHaveValue("website_launch");
+  await expect(page.locator('select[name="siteType"]')).toHaveValue("sales_landing");
+  await expect(page.locator('select[name="deploymentTarget"]')).toHaveValue("source_only");
 });
 
 test("language switcher keeps the public page keyboard-addressable", async ({ page }) => {

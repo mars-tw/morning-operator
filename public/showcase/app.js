@@ -10,7 +10,7 @@ const uiCopy = {
     "preview.notice": "Synthetic data only. No payment, booking, message, account, or personal data is created here.",
     "hero.kicker": "A project sample wall for people who build",
     "hero.title": "Study the plan.\nTouch the prototype.\nRemix the source.",
-    "hero.description": "Four small, fixed-scope concepts show what can be previewed for free before anyone connects a domain, customer record, payment provider, or production system.",
+    "hero.description": "Four small, fixed-scope concepts plus a core SEO growth lab show what can be previewed before anyone connects a domain, customer record, payment provider, or production system.",
     "hero.primary": "Explore four plans",
     "hero.source": "View source on GitHub",
     "hero.ruleOneLabel": "Data",
@@ -54,7 +54,22 @@ const uiCopy = {
     "remix.two": "Keep the first preview static and free of personal data.",
     "remix.three": "Add providers only after privacy, payment, and deployment review.",
     "footer.line": "Open source under Apache-2.0. Built as an educational project showcase.",
-    "footer.source": "Source and documentation"
+    "footer.source": "Source and documentation",
+    "seo.kicker": "Core service / SEO foundation",
+    "seo.title": "Route expertise into useful search pages.",
+    "seo.description": "Choose three non-personal categories. The lab returns a synthetic route from search intent to a 90-day measurement experiment.",
+    "seo.stamp": "SCENARIO · NOT A SITE AUDIT",
+    "seo.business": "Business pattern",
+    "seo.goal": "Search goal",
+    "seo.market": "Market scope",
+    "seo.privacy": "No URL, account, analytics, email, or customer record is requested, fetched, or stored.",
+    "seo.intentTitle": "Search intent",
+    "seo.mapTitle": "Page map",
+    "seo.technicalTitle": "Technical checks",
+    "seo.experimentTitle": "Measurement experiment",
+    "seo.boundaryTitle": "Human gate",
+    "seo.boundary": "The owner verifies expertise, claims, rights, structured data, and every production publication. No ranking, traffic, lead, or revenue outcome is guaranteed.",
+    "seo.official": "Read Google Search Central guidance"
   },
   "zh-TW": {
     "access.skip": "跳到專案範例",
@@ -62,7 +77,7 @@ const uiCopy = {
     "preview.notice": "僅使用合成資料；不會建立付款、預約、訊息、帳號或個人資料。",
     "hero.kicker": "給實作者的專案樣品牆",
     "hero.title": "先看計畫。\n再玩原型。\n最後改成自己的。",
-    "hero.description": "四個小型、固定範圍的概念，讓任何人都能在連接網域、客戶紀錄、金流或正式系統以前免費評估。",
+    "hero.description": "四個小型固定範圍概念，加上一個主力 SEO 成長實驗室，讓任何人都能在連接網域、客戶紀錄、金流或正式系統以前免費評估。",
     "hero.primary": "查看四種計畫",
     "hero.source": "在 GitHub 查看原始碼",
     "hero.ruleOneLabel": "資料",
@@ -106,7 +121,22 @@ const uiCopy = {
     "remix.two": "第一版維持靜態，完全不放個人資料。",
     "remix.three": "完成隱私、金流與部署審查後才加入供應商。",
     "footer.line": "採 Apache-2.0 開源授權，作為教育用途的專案展示。",
-    "footer.source": "原始碼與文件"
+    "footer.source": "原始碼與文件",
+    "seo.kicker": "主力服務／SEO 基礎工程",
+    "seo.title": "把專業導向真正有用的搜尋頁面。",
+    "seo.description": "只選三種非個人分類；實驗室會產生從搜尋意圖到 90 天量測實驗的合成路線。",
+    "seo.stamp": "僅為情境 · 不是實站健檢",
+    "seo.business": "業務型態",
+    "seo.goal": "搜尋目標",
+    "seo.market": "市場範圍",
+    "seo.privacy": "不要求、不抓取也不儲存網址、帳號、分析資料、Email 或客戶紀錄。",
+    "seo.intentTitle": "搜尋意圖",
+    "seo.mapTitle": "頁面地圖",
+    "seo.technicalTitle": "技術檢查",
+    "seo.experimentTitle": "量測實驗",
+    "seo.boundaryTitle": "人工閘門",
+    "seo.boundary": "負責人核對專業、主張、權利、結構化資料與每次正式發佈；不保證排名、流量、商機或收入。",
+    "seo.official": "閱讀 Google Search Central 指南"
   },
   ja: {
     "access.skip": "プロジェクトへ移動",
@@ -114,7 +144,7 @@ const uiCopy = {
     "preview.notice": "合成データのみ。決済、予約、メッセージ、アカウント、個人データは作成されません。",
     "hero.kicker": "つくる人のためのプロジェクト見本棚",
     "hero.title": "計画を読む。\n試作品に触れる。\nソースを自分用に変える。",
-    "hero.description": "ドメイン、顧客記録、決済、または本番システムを接続する前に、4つの小さな固定スコープ案を無料で評価できます。",
+    "hero.description": "4つの小さな固定スコープ案と主力SEO成長ラボを、ドメイン、顧客記録、決済、本番システム接続前に無料評価できます。",
     "hero.primary": "4つの計画を見る",
     "hero.source": "GitHubでソースを見る",
     "hero.ruleOneLabel": "データ",
@@ -158,7 +188,22 @@ const uiCopy = {
     "remix.two": "最初のプレビューは静的で個人情報なしに保つ。",
     "remix.three": "プライバシー、決済、公開審査後にだけ事業者を追加する。",
     "footer.line": "Apache-2.0で公開された教育用プロジェクト展示です。",
-    "footer.source": "ソースと文書"
+    "footer.source": "ソースと文書",
+    "seo.kicker": "主力サービス／SEO基盤",
+    "seo.title": "専門知識を役立つ検索ページへ導く。",
+    "seo.description": "個人情報を含まない3分類を選ぶと、検索意図から90日測定実験までの合成経路を返します。",
+    "seo.stamp": "シナリオ · 実サイト監査ではありません",
+    "seo.business": "事業パターン",
+    "seo.goal": "検索目標",
+    "seo.market": "市場範囲",
+    "seo.privacy": "URL、アカウント、分析、メール、顧客記録を要求、取得、保存しません。",
+    "seo.intentTitle": "検索意図",
+    "seo.mapTitle": "ページマップ",
+    "seo.technicalTitle": "技術チェック",
+    "seo.experimentTitle": "測定実験",
+    "seo.boundaryTitle": "人の承認",
+    "seo.boundary": "責任者が専門性、主張、権利、構造化データ、本番公開を確認します。順位、流入、商談、収益は保証しません。",
+    "seo.official": "Google Search Central ガイドを読む"
   },
   es: {
     "access.skip": "Ir a los proyectos",
@@ -166,7 +211,7 @@ const uiCopy = {
     "preview.notice": "Solo datos sintéticos. No se crea ningún pago, reserva, mensaje, cuenta ni dato personal.",
     "hero.kicker": "Un muro de muestras para quienes construyen",
     "hero.title": "Estudia el plan.\nPrueba el prototipo.\nAdapta el código.",
-    "hero.description": "Cuatro conceptos pequeños y de alcance fijo permiten evaluar gratis antes de conectar dominio, clientes, pagos o producción.",
+    "hero.description": "Cuatro conceptos de alcance fijo y un laboratorio SEO principal permiten evaluar antes de conectar dominio, clientes, pagos o producción.",
     "hero.primary": "Explorar cuatro planes",
     "hero.source": "Ver código en GitHub",
     "hero.ruleOneLabel": "Datos",
@@ -210,7 +255,109 @@ const uiCopy = {
     "remix.two": "Mantén la primera prueba estática y sin datos personales.",
     "remix.three": "Añade proveedores solo tras revisar privacidad, pagos y despliegue.",
     "footer.line": "Código abierto Apache-2.0. Muestra educativa de proyectos.",
-    "footer.source": "Código y documentación"
+    "footer.source": "Código y documentación",
+    "seo.kicker": "Servicio principal / Base SEO",
+    "seo.title": "Dirige la experiencia hacia páginas de búsqueda útiles.",
+    "seo.description": "Elige tres categorías no personales. El laboratorio crea una ruta sintética desde la intención hasta un experimento de 90 días.",
+    "seo.stamp": "ESCENARIO · NO ES AUDITORÍA DEL SITIO",
+    "seo.business": "Patrón de negocio",
+    "seo.goal": "Objetivo de búsqueda",
+    "seo.market": "Alcance del mercado",
+    "seo.privacy": "No se solicita, obtiene ni guarda URL, cuenta, analítica, email ni registro de clientes.",
+    "seo.intentTitle": "Intención de búsqueda",
+    "seo.mapTitle": "Mapa de páginas",
+    "seo.technicalTitle": "Controles técnicos",
+    "seo.experimentTitle": "Experimento de medición",
+    "seo.boundaryTitle": "Control humano",
+    "seo.boundary": "El responsable verifica experiencia, afirmaciones, derechos, datos estructurados y cada publicación. No se garantiza posición, tráfico, oportunidades ni ingresos.",
+    "seo.official": "Leer la guía de Google Search Central"
+  }
+};
+
+const seoScenarios = {
+  en: {
+    compose: "Use {business} within {market}.",
+    businesses: [
+      { label: "Local service", map: "Home → one service page → evidence or process → contact path." },
+      { label: "Appointment service", map: "Home → service detail → approved availability explanation → booking path." },
+      { label: "Product catalog", map: "Home → category → useful product detail → delivery and support information." },
+      { label: "Knowledge product", map: "Home → topic hub → original guide or lesson → product or enrollment path." }
+    ],
+    goals: [
+      { label: "Brand discovery", intent: "Discovery, identity, proof, and trust questions.", experiment: "Days 1–30 establish branded and non-branded baselines; days 31–60 publish bounded improvements; days 61–90 compare qualified discovery clicks." },
+      { label: "Service inquiry", intent: "Problem, comparison, process, fit, and contact questions.", experiment: "Baseline inquiry paths first; publish up to three priority improvements; compare qualified clicks and owner-approved inquiry events." },
+      { label: "Product exploration", intent: "Category, use-case, comparison, specification, and delivery questions.", experiment: "Baseline category visibility; repair one useful product route; compare indexed pages, qualified product clicks, and approved actions." },
+      { label: "Educational discovery", intent: "How, why, example, method, and next-step questions.", experiment: "Baseline topic visibility; publish original expert material; compare impressions, qualified reading clicks, and approved next steps." }
+    ],
+    markets: [
+      { label: "One city", technical: "Crawlable HTML, descriptive title and H1, canonical, internal links, sitemap, and factual local-business data only when visible." },
+      { label: "One region", technical: "One canonical route per useful intent, clear regional context, internal links, sitemap, and no near-duplicate location doorway pages." },
+      { label: "Multiple regions", technical: "Distinct useful regional pages only, stable canonicals, crawlable links, sitemap coverage, and duplicate-content review." },
+      { label: "Multiple languages", technical: "Separate locale URLs, self-canonicals, reciprocal hreflang with x-default, crawlable links, and human-reviewed translation." }
+    ]
+  },
+  "zh-TW": {
+    compose: "以「{business}」服務「{market}」。",
+    businesses: [
+      { label: "在地服務", map: "首頁 → 單一服務頁 → 證據或流程 → 聯絡路徑。" },
+      { label: "預約服務", map: "首頁 → 服務細節 → 已核准空檔說明 → 預約路徑。" },
+      { label: "商品型錄", map: "首頁 → 分類 → 有用商品細節 → 配送與支援資訊。" },
+      { label: "知識產品", map: "首頁 → 主題中心 → 原創指南或課程 → 產品或報名路徑。" }
+    ],
+    goals: [
+      { label: "品牌發現", intent: "品牌探索、身分、證據與信任問題。", experiment: "第 1–30 天建立品牌與非品牌基準；31–60 天發布有限改善；61–90 天比較合格探索點擊。" },
+      { label: "服務詢問", intent: "問題、比較、流程、適配與聯絡問題。", experiment: "先建立詢問路徑基準；最多改善三個優先頁面；比較合格點擊與負責人核准的詢問事件。" },
+      { label: "商品探索", intent: "分類、用途、比較、規格與配送問題。", experiment: "先建立分類能見度基準；修復一條有用商品路線；比較索引頁、合格商品點擊與已核准行動。" },
+      { label: "教育內容", intent: "怎麼做、為什麼、範例、方法與下一步問題。", experiment: "先建立主題能見度基準；發布原創專業內容；比較曝光、合格閱讀點擊與已核准下一步。" }
+    ],
+    markets: [
+      { label: "單一城市", technical: "可爬取 HTML、描述性 title 與 H1、canonical、內部連結、sitemap；只有畫面可見時才標記真實在地商家資料。" },
+      { label: "單一區域", technical: "每個有用意圖一條標準路線、清楚區域脈絡、內部連結與 sitemap；不建立相似地區入口頁。" },
+      { label: "多個區域", technical: "只建立內容確實不同的區域頁、穩定 canonical、可爬取連結、sitemap 覆蓋與重複內容檢查。" },
+      { label: "多種語言", technical: "分開語系網址、自我 canonical、互相對應 hreflang 與 x-default、可爬取連結及人工審稿翻譯。" }
+    ]
+  },
+  ja: {
+    compose: "{market}で{business}を扱います。",
+    businesses: [
+      { label: "地域サービス", map: "ホーム → 1つのサービス → 証拠または手順 → 問い合わせ経路。" },
+      { label: "予約サービス", map: "ホーム → サービス詳細 → 承認済み空き状況説明 → 予約経路。" },
+      { label: "商品カタログ", map: "ホーム → カテゴリ → 有用な商品詳細 → 配送・支援情報。" },
+      { label: "知識商品", map: "ホーム → トピックハブ → 独自ガイドまたは講座 → 商品・申込経路。" }
+    ],
+    goals: [
+      { label: "ブランド発見", intent: "発見、身元、証拠、信頼に関する質問。", experiment: "1–30日でブランド／非ブランド基準、31–60日で限定改善、61–90日で適格な発見クリックを比較します。" },
+      { label: "サービス相談", intent: "課題、比較、手順、適合、問い合わせに関する質問。", experiment: "相談経路の基準を作り、優先3ページまで改善し、適格クリックと承認済み相談行動を比較します。" },
+      { label: "商品探索", intent: "カテゴリ、用途、比較、仕様、配送に関する質問。", experiment: "カテゴリ表示基準を作り、1つの商品経路を修正し、索引ページ、適格商品クリック、承認済み行動を比較します。" },
+      { label: "教育コンテンツ", intent: "方法、理由、例、手法、次の行動に関する質問。", experiment: "トピック基準を作り、独自の専門内容を公開し、表示、適格閲覧クリック、承認済み次行動を比較します。" }
+    ],
+    markets: [
+      { label: "1つの都市", technical: "クロール可能HTML、説明的title/H1、canonical、内部リンク、sitemap、画面に見える事実だけの地域事業データ。" },
+      { label: "1つの地域", technical: "有用な意図ごとに1つの正規経路、明確な地域文脈、内部リンク、sitemap、重複した地域誘導ページなし。" },
+      { label: "複数地域", technical: "実質的に異なる地域ページだけ、安定canonical、クロール可能リンク、sitemap網羅、重複内容確認。" },
+      { label: "複数言語", technical: "言語別URL、自己canonical、相互hreflangとx-default、クロール可能リンク、人が確認した翻訳。" }
+    ]
+  },
+  es: {
+    compose: "Usa {business} dentro de {market}.",
+    businesses: [
+      { label: "Servicio local", map: "Inicio → un servicio → pruebas o proceso → vía de contacto." },
+      { label: "Servicio con citas", map: "Inicio → detalle del servicio → disponibilidad aprobada → vía de reserva." },
+      { label: "Catálogo de productos", map: "Inicio → categoría → detalle útil → información de entrega y soporte." },
+      { label: "Producto de conocimiento", map: "Inicio → centro temático → guía o lección original → producto o inscripción." }
+    ],
+    goals: [
+      { label: "Descubrimiento de marca", intent: "Preguntas de descubrimiento, identidad, prueba y confianza.", experiment: "Días 1–30: base de marca y no marca; 31–60: mejoras limitadas; 61–90: comparar clics cualificados de descubrimiento." },
+      { label: "Consulta de servicio", intent: "Preguntas de problema, comparación, proceso, encaje y contacto.", experiment: "Primero crea la base de consultas; mejora hasta tres páginas prioritarias; compara clics y consultas aprobadas." },
+      { label: "Exploración de producto", intent: "Preguntas de categoría, uso, comparación, especificación y entrega.", experiment: "Crea la base de categorías; repara una ruta útil; compara páginas indexadas, clics cualificados y acciones aprobadas." },
+      { label: "Descubrimiento educativo", intent: "Preguntas de cómo, por qué, ejemplo, método y siguiente paso.", experiment: "Crea la base temática; publica experiencia original; compara impresiones, lectura cualificada y siguientes pasos aprobados." }
+    ],
+    markets: [
+      { label: "Una ciudad", technical: "HTML rastreable, title y H1 descriptivos, canonical, enlaces, sitemap y datos locales factuales solo si son visibles." },
+      { label: "Una región", technical: "Una ruta canónica por intención útil, contexto regional claro, enlaces, sitemap y sin páginas puerta casi duplicadas." },
+      { label: "Varias regiones", technical: "Solo páginas regionales realmente distintas, canonical estable, enlaces rastreables, sitemap y revisión de duplicados." },
+      { label: "Varios idiomas", technical: "URL separadas, canonical propio, hreflang recíproco con x-default, enlaces rastreables y traducción revisada por personas." }
+    ]
   }
 };
 
@@ -279,7 +426,8 @@ const state = {
   mode: 0,
   selectedSlot: null,
   openModule: 0,
-  boardFilter: "all"
+  boardFilter: "all",
+  seo: { business: 0, goal: 0, market: 0 }
 };
 
 function element(tag, className, text) {
@@ -306,7 +454,7 @@ function setLocale(locale) {
   if (!localeIds.includes(locale)) return;
   state.locale = locale;
   document.documentElement.lang = locale;
-  document.title = `${locale === "zh-TW" ? "早安店長" : "Morning Operator"} — Open Project Preview Lab`;
+  document.title = `${locale === "zh-TW" ? "早安店長" : "Morning Operator"} — Open Project and SEO Growth Lab`;
   document.querySelectorAll("[data-locale]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.locale === locale));
   });
@@ -316,6 +464,43 @@ function setLocale(locale) {
   });
   renderProjects();
   renderSelectedProject();
+  renderSeoLab();
+}
+
+function formatScenario(template, values) {
+  return template.replace(/\{([a-z]+)\}/g, (_, key) => values[key] ?? "");
+}
+
+function renderSeoChoices(containerSelector, options, selectedIndex, key) {
+  const container = document.querySelector(containerSelector);
+  const buttons = options.map((option, index) => {
+    const button = element("button", "", option.label);
+    button.type = "button";
+    button.setAttribute("aria-pressed", String(index === selectedIndex));
+    button.addEventListener("click", () => {
+      state.seo[key] = index;
+      renderSeoLab();
+    });
+    return button;
+  });
+  container.replaceChildren(...buttons);
+}
+
+function renderSeoLab() {
+  const scenario = seoScenarios[state.locale];
+  const business = scenario.businesses[state.seo.business];
+  const goal = scenario.goals[state.seo.goal];
+  const market = scenario.markets[state.seo.market];
+
+  renderSeoChoices("#seo-business-options", scenario.businesses, state.seo.business, "business");
+  renderSeoChoices("#seo-goal-options", scenario.goals, state.seo.goal, "goal");
+  renderSeoChoices("#seo-market-options", scenario.markets, state.seo.market, "market");
+
+  const scope = formatScenario(scenario.compose, { business: business.label, market: market.label });
+  document.querySelector("#seo-intent-output").textContent = `${goal.intent} ${scope}`;
+  document.querySelector("#seo-map-output").textContent = business.map;
+  document.querySelector("#seo-technical-output").textContent = market.technical;
+  document.querySelector("#seo-experiment-output").textContent = goal.experiment;
 }
 
 function setProject(projectId) {

@@ -25,6 +25,32 @@ describe("open project preview gallery", () => {
     expect(source).not.toMatch(/\b(?:innerHTML|outerHTML|insertAdjacentHTML)\b/);
   });
 
+  it("publishes a no-data SEO growth lab with four ordered outputs", () => {
+    const html = read("index.html");
+    const script = read("app.js");
+    expect(html).toContain('id="seo-growth-lab"');
+    expect(script).toContain("const seoScenarios");
+    expect(script).toContain("function renderSeoLab");
+    for (const output of ["seo-intent-output", "seo-map-output", "seo-technical-output", "seo-experiment-output"]) {
+      expect(html).toContain(`id="${output}"`);
+    }
+    expect(html).not.toMatch(/<\s*(?:form|input|textarea|select)\b/i);
+  });
+
+  it("ships truthful search metadata, sitemap, structured data, and a noindex 404", () => {
+    const html = read("index.html");
+    const notFound = read("404.html");
+    const sitemap = read("sitemap.xml");
+    expect(html).toContain('rel="canonical" href="https://mars-tw.github.io/morning-operator/"');
+    expect(html).toContain('property="og:title"');
+    expect(html).toContain('name="twitter:card"');
+    const jsonLd = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+    expect(jsonLd).toBeTruthy();
+    expect(JSON.parse(jsonLd ?? "{}")).toMatchObject({ "@type": "CollectionPage" });
+    expect(notFound).toContain('content="noindex,follow"');
+    expect(sitemap).toContain("https://mars-tw.github.io/morning-operator/");
+  });
+
   it("keeps the synthetic preview and accessibility boundaries visible", () => {
     const html = read("index.html");
     const css = read("styles.css");

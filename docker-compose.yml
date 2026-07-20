@@ -59,6 +59,7 @@ services:
       dockerfile: Dockerfile
       target: web
       args:
+        AUTOPILOT_BASE_URL: ${AUTOPILOT_BASE_URL:?Set AUTOPILOT_BASE_URL to the public HTTPS URL}
         NEXT_PUBLIC_CHECKOUT_URL: ${NEXT_PUBLIC_CHECKOUT_URL:-}
         NEXT_PUBLIC_DEFAULT_LOCALE: ${NEXT_PUBLIC_DEFAULT_LOCALE:-en}
         NEXT_PUBLIC_DEMO_MODE: ${NEXT_PUBLIC_DEMO_MODE:-true}

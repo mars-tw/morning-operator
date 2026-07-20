@@ -23,6 +23,7 @@ import {
   type IndustryPackId
 } from "./industry-packs";
 import { assertProjectTransition } from "./project-machine";
+import { getProjectRecipe, type ProjectRecipeId } from "./project-recipes";
 import { getPublicOffer } from "./public-config";
 import {
   deploymentProviders,
@@ -42,6 +43,8 @@ export type LeadRow = {
   locale: string;
   industry_pack: IndustryPackId;
   industry_pack_version: number;
+  project_recipe: ProjectRecipeId | null;
+  project_recipe_version: number | null;
   primary_platform: string;
   automation_goal: string;
   site_type: SiteType;
@@ -161,18 +164,19 @@ export function createLead(rawInput: IntakeDraft): LeadRow {
   const offer = getPublicOffer(input.locale);
   const estimate = estimateAutomationOutcome(input, offer.setupMinor, offer.monthlyMinor);
   const t = createTranslator(input.locale);
+  const projectRecipe = input.projectRecipe ? getProjectRecipe(input.projectRecipe) : undefined;
   const status = estimate.riskTier === "restricted" ? "restricted" : estimate.qualified ? "qualified" : score >= 40 ? "nurture" : "not_fit";
   db.transaction(() => {
     db.prepare(
       `INSERT INTO leads (
-        id, locale, industry_pack, industry_pack_version, primary_platform, automation_goal, site_type, deployment_target,
+        id, locale, industry_pack, industry_pack_version, project_recipe, project_recipe_version, primary_platform, automation_goal, site_type, deployment_target,
         brand_name, email, store_url,
         industry, uses_shopify, uses_current_platform, monthly_orders, team_size, daily_minutes,
         weekly_report_minutes, biggest_problem, requested_scope, implementation_timing, hourly_cost_minor,
         privacy_consent, marketing_consent, company_note, score, estimated_monthly_hours, risk_tier,
         recoverable_hours_low, recoverable_hours_high, monthly_value_low, monthly_value_high, status, created_at
       ) VALUES (
-        @id, @locale, @industryPack, @industryPackVersion, @primaryPlatform, @automationGoal, @siteType, @deploymentTarget,
+        @id, @locale, @industryPack, @industryPackVersion, @projectRecipe, @projectRecipeVersion, @primaryPlatform, @automationGoal, @siteType, @deploymentTarget,
         @brandName, @email, @storeUrl,
         @industry, @usesShopify, @usesCurrentPlatform, @monthlyOrders, @teamSize, @dailyMinutes,
         @weeklyReportMinutes, @biggestProblem, @requestedScope, @implementationTiming, @hourlyCostMinor,
@@ -184,6 +188,8 @@ export function createLead(rawInput: IntakeDraft): LeadRow {
       locale: input.locale,
       industryPack: input.industryPack,
       industryPackVersion: getIndustryPack(input.industryPack).version,
+      projectRecipe: projectRecipe?.id ?? null,
+      projectRecipeVersion: projectRecipe?.version ?? null,
       primaryPlatform: input.primaryPlatform,
       automationGoal: input.automationGoal,
       siteType: input.siteType,
@@ -232,6 +238,7 @@ export function createLead(rawInput: IntakeDraft): LeadRow {
       status,
       locale: input.locale,
       industryPack: input.industryPack,
+      projectRecipe: projectRecipe?.id ?? null,
       automationGoal: input.automationGoal,
       siteType: input.siteType,
       deploymentTarget: input.deploymentTarget,
@@ -447,7 +454,7 @@ export function transitionProject(projectId: string, to: ProjectState, actor: st
 export function createSpecification(projectId: string): string {
   const db = getDb();
   const row = db.prepare(
-    `SELECT p.*, l.brand_name, l.store_url, l.industry_pack, l.primary_platform, l.automation_goal,
+    `SELECT p.*, l.brand_name, l.store_url, l.industry_pack, l.project_recipe, l.project_recipe_version, l.primary_platform, l.automation_goal,
             l.site_type, l.deployment_target,
             l.monthly_orders, l.biggest_problem, l.requested_scope, l.risk_tier, l.company_note
        FROM projects p JOIN leads l ON l.id = p.lead_id WHERE p.id = ?`
@@ -461,7 +468,25 @@ export function createSpecification(projectId: string): string {
     throw new Error("Project requires manual review: unknown website deployment selection");
   }
   const pack = getIndustryPack(row.industry_pack);
+  const recipe = row.project_recipe ? getProjectRecipe(row.project_recipe) : undefined;
+  if (row.project_recipe && (
+    !recipe ||
+    recipe.version !== row.project_recipe_version ||
+    recipe.industryPackId !== row.industry_pack ||
+    !(recipe.goals as readonly string[]).includes(row.automation_goal)
+  )) {
+    throw new Error("Project requires manual review: invalid-project-recipe");
+  }
   const deployment = deploymentProviders[row.deployment_target];
+  const recipeRequirements = recipe
+    ? [
+        `- Recipe: ${recipe.id}@${recipe.version}`,
+        "- Approved inputs:",
+        ...recipe.inputs.map((input) => `  - ${input}`),
+        "- Fixed outputs:",
+        ...recipe.outputs.map((output) => `  - ${output}`)
+      ]
+    : ["- Recipe: legacy pack-only intake"];
   const websiteRequirements = row.site_type === "none"
     ? ["- Website deliverable: not requested"]
     : [
@@ -485,6 +510,7 @@ export function createSpecification(projectId: string): string {
     `- Automation goal: ${sanitizeCustomerText(row.automation_goal, 80)}`,
     `- Monthly work volume: ${row.monthly_orders}`,
     `- Scope: ${row.requested_scope}`,
+    ...recipeRequirements,
     "",
     "## Website launch requirements",
     ...websiteRequirements,
@@ -494,13 +520,16 @@ export function createSpecification(projectId: string): string {
     "",
     "## Success metrics",
     ...pack.metrics.map((metric) => `- ${metric}`),
+    ...(recipe?.metrics.map((metric) => `- ${metric}`) ?? []),
     "",
     "## Required human approvals",
     ...pack.requiredApprovals.map((approval) => `- ${approval}`),
+    ...(recipe?.requiredApprovals.map((approval) => `- recipe:${approval}`) ?? []),
     "- production_delivery",
     "",
     "## Prohibited actions",
     ...pack.prohibitedActions.map((action) => `- ${action}`),
+    ...(recipe?.prohibitedActions.map((action) => `- recipe:${action}`) ?? []),
     "- No consequential medical, financial, employment, legal, housing, or safety decision.",
     "- No external write, send, publish, refund, payment, or deletion without a recorded approval.",
     "- Do not send unnecessary personal data or raw confidential records to AI systems.",
@@ -509,6 +538,7 @@ export function createSpecification(projectId: string): string {
     "> Withheld from the AI build specification. An owner must review and convert any useful context into approved requirements.",
     "",
     "## Acceptance criteria",
+    ...(recipe ? recipe.verificationChecks.map((check) => `- Recipe check: ${check}`) : []),
     "1. Synthetic fixtures reproduce the approved workflow without real customer records.",
     "2. Repeated provider events remain idempotent.",
     "3. Missing or ambiguous data produces a review task instead of an external action.",

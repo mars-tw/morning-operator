@@ -15,6 +15,7 @@ import {
 export const projectRecipeIds = [
   "commerce-groupbuy",
   "professional-it-monitoring",
+  "professional-seo-foundation",
   "backoffice-manufacturing-watch",
   "appointments-community-events",
   "household-finance-private"
@@ -140,7 +141,7 @@ export const projectRecipes = {
     id: "professional-it-monitoring",
     version: 1,
     industryPackId: "professional_services",
-    goals: ["reporting", "document_ops", "website_launch"],
+    goals: ["website_launch", "reporting", "document_ops"],
     inputs: [
       "owner-approved targets and scan scope",
       "availability and certificate metadata",
@@ -189,6 +190,99 @@ export const projectRecipes = {
     revenueScenario: {
       type: "scenario",
       description: "A possible scenario is an authorized one-time health check followed by an optional monitoring retainer.",
+      disclaimer: "Scenario only; revenue and profit are not guaranteed."
+    }
+  },
+  "professional-seo-foundation": {
+    id: "professional-seo-foundation",
+    version: 1,
+    industryPackId: "professional_services",
+    goals: ["website_launch", "reporting", "document_ops"],
+    inputs: [
+      "one owner-authorized canonical origin, one locale and a maximum of 20 public URLs",
+      "owner-approved public service and audience summary",
+      "public page inventory without customer or account identifiers",
+      "aggregate search performance exported with minimum necessary fields",
+      "approved claims, terminology and geographic scope"
+    ],
+    outputs: [
+      "search-intent map linked to one useful page per intent",
+      "crawl, index, canonical, locale and structured-data checklist",
+      "reviewable briefs and source patch for up to three priority pages with one owner revision",
+      "90-day measurement board with an exception queue"
+    ],
+    freeFirstDeployments: ["source_only", "cloudflare_pages"],
+    estimatedCoverage: { low: 0.25, high: 0.45, basis: "scenario_not_guarantee" },
+    metrics: [
+      "priority_pages_indexed",
+      "qualified_organic_clicks",
+      "owner_defined_conversion_events",
+      "technical_issue_recurrence",
+      "manual_interventions"
+    ],
+    requiredApprovals: [
+      "domain_ownership",
+      "crawl_scope",
+      "priority_pages",
+      "search_strategy",
+      "claim_and_content_accuracy",
+      "structured_data_accuracy",
+      "search_console_access",
+      "production_publication"
+    ],
+    prohibitedActions: [
+      "ranking_or_revenue_guarantees",
+      "keyword_stuffing_or_doorway_pages",
+      "paid_or_automated_link_schemes",
+      "fake_reviews_ratings_or_local_listings",
+      "cloaking_or_hidden_content",
+      "unreviewed_autonomous_publication",
+      "competitor_confidential_data_collection",
+      "visitor_or_customer_pii_to_ai"
+    ],
+    privacyBoundary: {
+      mode: "public_catalog_private_records",
+      allowedData: [
+        "public pages and approved brand claims",
+        "aggregate query, page, country and device measurements",
+        "sanitized crawl findings without credentials or visitor identifiers"
+      ],
+      forbiddenDataFlows: [
+        "analytics user identifiers or raw visitor events to AI",
+        "search console credentials or account exports in generated workspaces",
+        "unpublished client documents or competitor confidential material"
+      ]
+    },
+    paymentBoundary: {
+      mode: "no_payment_processing",
+      rules: [
+        "keep SEO measurement separate from merchant payment state",
+        "use a separately approved commercial agreement for paid delivery"
+      ]
+    },
+    setupSteps: [
+      "Record ownership for one canonical origin, one locale, no more than 20 public URLs and three priority pages.",
+      "Choose one audience, one offer and a bounded set of search intents.",
+      "Inventory the approved public pages and map each intent to one useful canonical destination.",
+      "Verify crawlability, indexing controls, locale alternates, metadata, links and truthful structured data.",
+      "Publish only after owner review, then measure a 90-day baseline and route exceptions for correction."
+    ],
+    verificationChecks: [
+      "titles, descriptions and headings remain useful and are not keyword stuffed",
+      "robots, sitemap, canonical and locale alternates reference only intended public URLs",
+      "structured data parses and describes visible factual content without fake ratings or outcomes",
+      "private, admin, API and preview-only records are not exposed for indexing",
+      "reports use aggregate measurements and label traffic, lead and revenue outcomes as non-guaranteed"
+    ],
+    knownLimitations: [
+      "Search engines decide crawling, indexing and ranking; technical compliance cannot guarantee inclusion or position.",
+      "A synthetic scenario is not a live site audit and does not replace Search Console or server evidence.",
+      "Meaningful results require original expertise, maintained content and owner-approved production changes.",
+      "A second origin, locale, batch of 20 URLs or additional revision requires a separately approved project scope."
+    ],
+    revenueScenario: {
+      type: "scenario",
+      description: "A possible scenario is a fixed SEO foundation engagement followed by optional monthly measurement and maintenance after a reviewed baseline.",
       disclaimer: "Scenario only; revenue and profit are not guaranteed."
     }
   },

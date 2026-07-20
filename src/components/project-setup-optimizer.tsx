@@ -98,6 +98,7 @@ const copy = {
     recipes: [
       ["Group-buy operations", "Validated orders, verified payments, private fulfillment records."],
       ["Authorized IT monitoring", "Scoped health checks, evidence reports, bounded alerts."],
+      ["SEO foundation sprint", "One approved domain, up to 20 URLs, three priority pages, and no ranking promises."],
       ["Manufacturing exception watch", "Read-only imports, explainable thresholds, planner review."],
       ["Community event desk", "Registration queues, approvals, idempotent notifications."],
       ["Private household records", "Single-tenant records and owner-reviewed categorization only."]
@@ -147,6 +148,7 @@ const copy = {
     recipes: [
       ["團購營運", "驗證訂單、簽章金流與私密出貨紀錄。"],
       ["授權 IT 監控", "限定範圍的健檢、證據報告與受控告警。"],
+      ["SEO 基礎改善衝刺", "一個已核准網域、最多 20 個網址、三個優先頁面，且不保證排名。"],
       ["製造異常看板", "唯讀匯入、可解釋門檻與人員覆核。"],
       ["社群活動櫃台", "報名佇列、核准與冪等通知。"],
       ["私人家計紀錄", "只限單一家庭與屋主覆核的分類。"]
@@ -196,6 +198,7 @@ const copy = {
     recipes: [
       ["共同購入運用", "検証済み注文、署名決済、非公開の出荷記録。"],
       ["認可済み IT 監視", "範囲限定チェック、証拠レポート、制御された通知。"],
+      ["SEO基盤改善スプリント", "承認済み1ドメイン、最大20 URL、優先3ページ。順位は保証しません。"],
       ["製造例外ウォッチ", "読み取り専用取込、説明可能な閾値、人の確認。"],
       ["コミュニティ受付", "登録キュー、承認、冪等な通知。"],
       ["個人家計記録", "単一家計と所有者確認の分類のみ。"]
@@ -245,6 +248,7 @@ const copy = {
     recipes: [
       ["Operaciones de compra grupal", "Pedidos validados, pagos verificados y datos privados de entrega."],
       ["Monitoreo IT autorizado", "Revisiones acotadas, informes probatorios y alertas controladas."],
+      ["Sprint de base SEO", "Un dominio aprobado, hasta 20 URL, tres páginas prioritarias y sin promesas de posición."],
       ["Alertas de fabricación", "Importación de solo lectura, umbrales explicables y revisión humana."],
       ["Mesa de eventos comunitarios", "Colas de registro, aprobaciones y avisos idempotentes."],
       ["Registros privados del hogar", "Solo un hogar y clasificación revisada por su propietario."]
@@ -255,6 +259,7 @@ const copy = {
 const recipeWrites: Record<ProjectRecipeId, boolean> = {
   "commerce-groupbuy": true,
   "professional-it-monitoring": true,
+  "professional-seo-foundation": false,
   "backoffice-manufacturing-watch": false,
   "appointments-community-events": true,
   "household-finance-private": true
@@ -264,6 +269,7 @@ function buildEvidence(recipeId: ProjectRecipeId, state: OptimizerState): Projec
   const hasWrites = recipeWrites[recipeId];
   const hasRetryableOperations = hasWrites;
   const paymentMode = state.payment === "verified" ? "live" : state.payment === "mock" ? "mock" : "none";
+  const needsIdempotency = hasWrites || hasRetryableOperations || paymentMode === "live";
   const marketDemandEvidence = state.market === "idea" ? "none" : state.market === "interest" ? "observed" : "verified";
   const revenueEvidence = state.market === "paid" ? "paid_once" : state.market === "repeatable" ? "repeatable_paid" : state.market === "interest" ? "interest" : "none";
 
@@ -276,7 +282,7 @@ function buildEvidence(recipeId: ProjectRecipeId, state: OptimizerState): Projec
     authRbac: state.data === "protected" ? "verified" : "absent",
     hasExternalWrites: hasWrites,
     hasRetryableOperations,
-    idempotency: hasWrites ? (state.operations === "missing" ? "absent" : state.operations === "idempotent" ? "partial" : "verified") : "not_applicable",
+    idempotency: needsIdempotency ? (state.operations === "missing" ? "absent" : state.operations === "idempotent" ? "partial" : "verified") : "not_applicable",
     paymentMode,
     paymentSignature: paymentMode === "live" ? "verified" : paymentMode === "mock" ? "mock_only" : "not_applicable",
     retryDeadLetter: hasRetryableOperations ? (state.operations === "resilient" ? "retry_and_dead_letter" : state.operations === "idempotent" ? "retry_only" : "absent") : "not_applicable",
@@ -298,7 +304,7 @@ function buildEvidence(recipeId: ProjectRecipeId, state: OptimizerState): Projec
 const verdictOrder = ["not_ready", "assignment_ready", "conditional_pilot", "commercial_pilot_ready", "commercial_go"] as const;
 
 export function ProjectSetupOptimizer({ locale }: { locale: Locale }) {
-  const [recipeId, setRecipeId] = useState<ProjectRecipeId>(projectRecipeIds[0]);
+  const [recipeId, setRecipeId] = useState<ProjectRecipeId>("professional-seo-foundation");
   const [state, setState] = useState<OptimizerState>(initialState);
   const [result, setResult] = useState<PreviewResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -339,7 +345,7 @@ export function ProjectSetupOptimizer({ locale }: { locale: Locale }) {
 
   function applyRecipe() {
     window.dispatchEvent(new CustomEvent("morning-operator:recipe-selected", {
-      detail: { packId: recipe.industryPackId, goal: recipe.goals[0] }
+      detail: { recipeId: recipe.id, packId: recipe.industryPackId, goal: recipe.goals[0] }
     }));
   }
 

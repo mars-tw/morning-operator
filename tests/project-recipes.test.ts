@@ -20,8 +20,8 @@ const safeBase = {
 } as const;
 
 describe("project recipe registry", () => {
-  it("contains exactly five valid, versioned recipes mapped to existing packs", () => {
-    expect(projectRecipeIds).toHaveLength(5);
+  it("contains exactly six valid, versioned recipes mapped to existing packs", () => {
+    expect(projectRecipeIds).toHaveLength(6);
     expect(Object.keys(projectRecipes)).toEqual([...projectRecipeIds]);
     expect(validateProjectRecipeRegistry()).toEqual([]);
 
@@ -92,6 +92,31 @@ describe("project recipe registry", () => {
       recipeId: "household-finance-private",
       autonomousFinancialDecisions: true
     })).toThrow(/financial decisions/);
+  });
+
+  it("defines SEO as measurable, approval-gated work without ranking manipulation", () => {
+    const recipe = getProjectRecipe("professional-seo-foundation");
+    expect(recipe).toBeDefined();
+    expect(recipe?.industryPackId).toBe("professional_services");
+    expect(recipe?.goals[0]).toBe("website_launch");
+    expect(recipe?.estimatedCoverage.basis).toBe("scenario_not_guarantee");
+    expect(recipe?.metrics).toEqual(expect.arrayContaining([
+      "priority_pages_indexed",
+      "qualified_organic_clicks",
+      "owner_defined_conversion_events"
+    ]));
+    expect(recipe?.requiredApprovals).toEqual(expect.arrayContaining([
+      "claim_and_content_accuracy",
+      "production_publication"
+    ]));
+    expect(recipe?.prohibitedActions).toEqual(expect.arrayContaining([
+      "ranking_or_revenue_guarantees",
+      "keyword_stuffing_or_doorway_pages",
+      "paid_or_automated_link_schemes",
+      "fake_reviews_ratings_or_local_listings",
+      "unreviewed_autonomous_publication",
+      "visitor_or_customer_pii_to_ai"
+    ]));
   });
 
   it("accepts safe setups for group-buy and private household finance", () => {

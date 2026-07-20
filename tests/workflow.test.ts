@@ -205,6 +205,32 @@ describe("business workflow", () => {
     expect(specification).not.toContain(created.email);
   });
 
+  it("persists the SEO recipe and carries its fixed scope and safety gates into the specification", async () => {
+    const created = lead({
+      projectRecipe: "professional-seo-foundation",
+      industryPack: "professional_services",
+      primaryPlatform: "website",
+      automationGoal: "website_launch",
+      siteType: "sales_landing",
+      deploymentTarget: "source_only",
+      industry: "professional",
+      biggestProblem: "content_reuse",
+      requestedScope: "draft_and_review"
+    });
+    expect(created.project_recipe).toBe("professional-seo-foundation");
+    expect(created.project_recipe_version).toBe(1);
+
+    const paid = payment(created.id, "event-seo-foundation");
+    await drainJobs();
+    const specification = getProject(paid.projectId)?.specification;
+    expect(specification).toContain("Recipe: professional-seo-foundation@1");
+    expect(specification).toContain("maximum of 20 public URLs");
+    expect(specification).toContain("recipe:domain_ownership");
+    expect(specification).toContain("recipe:ranking_or_revenue_guarantees");
+    expect(specification).toContain("Recipe check: structured data parses");
+    expect(specification).not.toContain(created.email);
+  });
+
   it("revalidates website hosting rules before drafting a build specification", () => {
     const created = lead({
       primaryPlatform: "website",

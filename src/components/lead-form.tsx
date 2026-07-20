@@ -9,6 +9,7 @@ import {
   type IndustryPackId,
   type RiskTier
 } from "@/lib/industry-packs";
+import { isProjectRecipeId, projectRecipes, type ProjectRecipeId } from "@/lib/project-recipes";
 import {
   deploymentProviderIds,
   getDeploymentCompatibility,
@@ -92,12 +93,14 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
   const [loading, setLoading] = useState(false);
   const [packId, setPackId] = useState<IndustryPackId>("commerce_ops");
   const [goal, setGoal] = useState<AutomationGoal>(industryPacks.commerce_ops.goals[0]);
+  const [projectRecipe, setProjectRecipe] = useState<ProjectRecipeId | null>(null);
   const [siteType, setSiteType] = useState<SiteType>("none");
   const [deploymentTarget, setDeploymentTarget] = useState<DeploymentProviderId>("source_only");
   const t = createTranslator(locale);
   const hourlyCostDefault = offer.defaultHourlyCostMinor / 10 ** offer.fractionDigits;
 
   function changePack(nextPackId: IndustryPackId) {
+    setProjectRecipe(null);
     setPackId(nextPackId);
     if (!(industryPacks[nextPackId].goals as readonly AutomationGoal[]).includes(goal)) {
       changeGoal(industryPacks[nextPackId].goals[0]);
@@ -105,6 +108,7 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
   }
 
   function changeGoal(nextGoal: AutomationGoal) {
+    setProjectRecipe(null);
     setGoal(nextGoal);
     if (nextGoal === "website_launch") {
       const nextSiteType = siteType === "none" ? "sales_landing" : siteType;
@@ -140,14 +144,17 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
 
   useEffect(() => {
     function receiveRecipeSelection(event: Event) {
-      const detail = (event as CustomEvent<{ packId?: unknown; goal?: unknown }>).detail;
-      if (typeof detail?.packId !== "string" || typeof detail.goal !== "string") return;
+      const detail = (event as CustomEvent<{ recipeId?: unknown; packId?: unknown; goal?: unknown }>).detail;
+      if (!isProjectRecipeId(detail?.recipeId) || typeof detail.packId !== "string" || typeof detail.goal !== "string") return;
       if (!(industryPackIds as readonly string[]).includes(detail.packId)) return;
       const nextPackId = detail.packId as IndustryPackId;
       if (!(industryPacks[nextPackId].goals as readonly string[]).includes(detail.goal)) return;
+      const recipe = projectRecipes[detail.recipeId];
+      if (recipe.industryPackId !== nextPackId || !(recipe.goals as readonly string[]).includes(detail.goal)) return;
+      setProjectRecipe(detail.recipeId);
       setPackId(nextPackId);
       setGoal(detail.goal as AutomationGoal);
-      setSiteType("none");
+      setSiteType(detail.goal === "website_launch" ? "sales_landing" : "none");
       setDeploymentTarget("source_only");
     }
     window.addEventListener("morning-operator:recipe-selected", receiveRecipeSelection);
@@ -167,6 +174,7 @@ export function LeadForm({ locale, offer }: { locale: Locale; offer: Offer }) {
       email: form.get("email"),
       storeUrl: form.get("storeUrl"),
       industryPack: packId,
+      projectRecipe: projectRecipe ?? undefined,
       primaryPlatform,
       automationGoal: goal,
       siteType,
