@@ -92,4 +92,29 @@ describe("lead scoring", () => {
       deploymentTarget: "github_pages"
     })).toThrow(/not compatible/);
   });
+
+  it("keeps a selected SEO recipe bound to its reviewed pack and goal", () => {
+    expect(intakeSchema.parse({
+      ...ideal,
+      projectRecipe: "professional-seo-foundation",
+      industryPack: "professional_services",
+      primaryPlatform: "website",
+      automationGoal: "website_launch",
+      siteType: "sales_landing",
+      deploymentTarget: "source_only"
+    }).projectRecipe).toBe("professional-seo-foundation");
+
+    expect(() => intakeSchema.parse({
+      ...ideal,
+      projectRecipe: "professional-seo-foundation",
+      industryPack: "commerce_ops"
+    })).toThrow(/does not match/);
+
+    expect(() => intakeSchema.parse({
+      ...ideal,
+      projectRecipe: "professional-seo-foundation",
+      industryPack: "professional_services",
+      automationGoal: "lead_followup"
+    })).toThrow(/does not support/);
+  });
 });

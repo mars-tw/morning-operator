@@ -13,6 +13,7 @@ import {
 } from "@/i18n";
 import { industryPackIds, industryPacks, type IndustryPackId } from "@/lib/industry-packs";
 import { getPublicOffer } from "@/lib/public-config";
+import { absoluteSiteUrl } from "@/lib/site-url";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
@@ -37,12 +38,32 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const locale = validLocale((await params).locale);
   const t = createTranslator(locale);
+  const localePath = `/${locale}`;
   return {
-    title: t("meta.title"),
+    title: { absolute: t("meta.title") },
     description: t("meta.description"),
     alternates: {
-      canonical: `/${locale}`,
-      languages: Object.fromEntries(supportedLocales.map((candidate) => [candidate, `/${candidate}`]))
+      canonical: localePath,
+      languages: Object.fromEntries([
+        ...supportedLocales.map((candidate) => [localeMetadata[candidate].htmlLang, `/${candidate}`]),
+        ["x-default", "/en"]
+      ])
+    },
+    openGraph: {
+      type: "website",
+      url: localePath,
+      siteName: "Morning Operator",
+      title: t("meta.title"),
+      description: t("meta.description"),
+      locale: localeMetadata[locale].htmlLang,
+      alternateLocale: supportedLocales
+        .filter((candidate) => candidate !== locale)
+        .map((candidate) => localeMetadata[candidate].htmlLang)
+    },
+    twitter: {
+      card: "summary",
+      title: t("meta.title"),
+      description: t("meta.description")
     }
   };
 }
@@ -52,6 +73,36 @@ export default async function LocalizedHomePage({ params }: PageProps) {
   const t = createTranslator(locale);
   const offer = getPublicOffer(locale);
   const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE !== "false";
+  const pageUrl = absoluteSiteUrl(`/${locale}`);
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${pageUrl}#organization`,
+        name: "Morning Operator",
+        url: pageUrl
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${pageUrl}#website`,
+        name: t("brand.name"),
+        url: pageUrl,
+        description: t("meta.description"),
+        inLanguage: localeMetadata[locale].htmlLang,
+        publisher: { "@id": `${pageUrl}#organization` }
+      },
+      {
+        "@type": "Service",
+        "@id": `${pageUrl}#seo-foundation-service`,
+        name: t("seo.eyebrow"),
+        description: t("seo.description"),
+        url: `${pageUrl}#seo`,
+        provider: { "@id": `${pageUrl}#organization` },
+        availableLanguage: supportedLocales.map((candidate) => localeMetadata[candidate].htmlLang)
+      }
+    ]
+  };
   const reportRows = [
     [t("report.sales"), "84", "+12.4%"],
     [t("report.pending"), "7", "REVIEW"],
@@ -61,6 +112,10 @@ export default async function LocalizedHomePage({ params }: PageProps) {
 
   return (
     <main lang={localeMetadata[locale].htmlLang} dir={localeMetadata[locale].direction}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replaceAll("<", "\\u003c") }}
+      />
       {demoMode && <div className="demo-banner" role="status">{t("demo.banner")}</div>}
       <nav className="site-nav" aria-label="Primary navigation">
         <a className="wordmark" href={`/${locale}#top`}>{t("brand.name")}</a>
@@ -68,6 +123,7 @@ export default async function LocalizedHomePage({ params }: PageProps) {
           <a href="#industries">{t("nav.industries")}</a>
           <a href="#project-setup">{t("nav.projects")}</a>
           <a href="#site-launch">{t("nav.sites")}</a>
+          <a href="#seo">{t("nav.seo")}</a>
           <a href="#offer">{t("nav.offer")}</a>
           <a href="#audit">{t("nav.audit")}</a>
           <a href="/admin">{t("nav.admin")}</a>
@@ -139,6 +195,27 @@ export default async function LocalizedHomePage({ params }: PageProps) {
       </section>
 
       <ProjectSetupOptimizer locale={locale} />
+
+      <section className="seo-core" id="seo" aria-labelledby="seo-title">
+        <div className="seo-core-intro">
+          <div>
+            <p className="eyebrow">{t("seo.eyebrow")}</p>
+            <h2 id="seo-title">{t("seo.title")}</h2>
+            <p>{t("seo.description")}</p>
+          </div>
+          <span className="seo-core-badge">{t("seo.badge")}</span>
+        </div>
+        <ol className="seo-route" aria-label={t("seo.title")}>
+          <li><span>01</span><div><h3>{t("seo.intentTitle")}</h3><p>{t("seo.intentBody")}</p></div></li>
+          <li><span>02</span><div><h3>{t("seo.mapTitle")}</h3><p>{t("seo.mapBody")}</p></div></li>
+          <li><span>03</span><div><h3>{t("seo.technicalTitle")}</h3><p>{t("seo.technicalBody")}</p></div></li>
+          <li><span>04</span><div><h3>{t("seo.measureTitle")}</h3><p>{t("seo.measureBody")}</p></div></li>
+        </ol>
+        <div className="seo-core-footer">
+          <div><strong>{t("seo.metrics")}</strong><p>{t("seo.boundary")}</p></div>
+          <a className="button primary" href="https://mars-tw.github.io/morning-operator/#seo-growth-lab">{t("seo.cta")}</a>
+        </div>
+      </section>
 
       <SiteLaunchPlanner locale={locale} />
 

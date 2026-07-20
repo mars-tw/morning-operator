@@ -8,7 +8,7 @@
 
 English · [繁體中文](README.zh-TW.md) · [日本語](docs/README.ja.md) · [Español](docs/README.es.md)
 
-**Free interactive preview:** [Open the four-project showcase](https://mars-tw.github.io/morning-operator/) · [Read the implementation and hosting guide](docs/free-preview-gallery.md)
+**Free interactive preview:** [Open the four-project showcase and SEO growth lab](https://mars-tw.github.io/morning-operator/) · [Read the SEO service specification](docs/seo-service.md)
 
 Morning Operator turns a public workflow audit into a controlled service-delivery pipeline: industry-pack selection, fit scoring, signed payment events, scope approval, isolated AI-assisted build, QA, delivery approval, notification, audit log, and backup. It is open source under Apache-2.0, provider-neutral, and designed to be self-hosted.
 
@@ -23,7 +23,8 @@ Small teams across many industries repeat the same reporting, lead follow-up, sc
 - Human approval before AI build and before production delivery.
 - Six versioned industry packs: commerce operations, professional services, appointments, creator/education, property/field services, and back-office operations.
 - A multilingual website launch planner for portable sales, campaign, catalog, and booking sites with free-first Cloudflare, Firebase, GCP, and source-only routes.
-- A dependency-free, four-locale open-source preview gallery for web design, appointments, creator products, and group-buy operations using synthetic data only.
+- A dependency-free, four-locale open-source preview gallery for web design, appointments, creator products, and group-buy operations, plus a no-data SEO growth lab.
+- A fixed-scope SEO foundation recipe for one approved origin, one locale, up to 20 URLs, three priority pages, and a reviewable 90-day measurement loop.
 - Provider-neutral adapters for payments, email, monitoring, business platforms, and AI execution.
 - SQLite job queue with leases, retry backoff, dead-letter state, and audit records.
 - Docker self-hosting with separate web and worker services.
@@ -69,7 +70,7 @@ The Compose setup uses a persistent SQLite volume, non-root containers, read-onl
 
 ## Workflow
 
-Learners can start with the multilingual project setup optimizer, select one of five reviewed recipes, and preview assignment execution, commercial delivery, market, and monetization readiness without storing customer data. See [project recipes and readiness](docs/project-recipes.md). Scores and revenue scenarios are estimates, never guarantees.
+Learners can start with the multilingual project setup optimizer, select one of six reviewed recipes, and preview assignment execution, commercial delivery, market, and monetization readiness without storing customer data. See [project recipes and readiness](docs/project-recipes.md). Scores and revenue scenarios are estimates, never guarantees.
 
 ```mermaid
 flowchart LR

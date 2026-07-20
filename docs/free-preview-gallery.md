@@ -15,6 +15,12 @@
 
 自動化覆蓋率、時程與變現方式都標示為情境，不是收入、需求、節省或成功保證。專案刻意從小範圍開始，讓使用者先驗證畫面、操作、交付內容與安全邊界，再決定是否投入主機、網域或供應商成本。
 
+## 主力 SEO 成長實驗室
+
+四個專案之外，展示站另有獨立的 SEO 成長實驗室。使用者只選業務型態、搜尋目標與市場範圍三組 enum，系統在瀏覽器內產生「搜尋意圖 → 頁面地圖 → 技術檢查 → 90 天量測」路線。它不收網址或 Email、不掃描網站、不連接 Search Console，也不保存分析資料，因此輸出明確標示為合成情境，而不是實站稽核。
+
+實驗室對應正式的 `professional-seo-foundation@1` recipe；固定範圍、資料邊界、核准與禁止作法見 [SEO 主力服務](seo-service.md)。
+
 ## 主機研究結論
 
 | 選項 | 本專案的判定 | 2026-07-20 官方依據 |
@@ -35,6 +41,8 @@ Morning Operator 主程式包含 SQLite、API、金流 Webhook、worker 與管�
 - 不載入遠端字型、圖片、分析或 runtime 套件。
 - 不使用表單、瀏覽器儲存、Cookie、網路請求或不安全 HTML sink。
 - 四語內容、四個計畫與非個資 JSON brief 都由同一個可稽核 registry 產生。
+- SEO 實驗室以原生按鈕操作，不新增表單、URL、Email、analytics 或 storage。
+- Absolute canonical、sitemap、Open Graph、Twitter metadata、真實 JSON-LD 與 404 `noindex` 皆由靜態驗證器檢查。
 - GitHub Pages artifact 只包含 `public/showcase/`，不包含資料庫、`.env`、後台或伺服器程式。
 
 ## 本機預覽與驗證

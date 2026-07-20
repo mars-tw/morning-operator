@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS leads (
   locale TEXT NOT NULL DEFAULT 'en',
   industry_pack TEXT NOT NULL DEFAULT 'commerce_ops',
   industry_pack_version INTEGER NOT NULL DEFAULT 1,
+  project_recipe TEXT,
+  project_recipe_version INTEGER,
   primary_platform TEXT NOT NULL DEFAULT 'shopify',
   automation_goal TEXT NOT NULL DEFAULT 'operations_alerts',
   site_type TEXT NOT NULL DEFAULT 'none',
@@ -172,6 +174,8 @@ export function getDb(): Database.Database {
     ensureColumn("leads", "locale", "TEXT NOT NULL DEFAULT 'en'");
     ensureColumn("leads", "industry_pack", "TEXT NOT NULL DEFAULT 'commerce_ops'");
     ensureColumn("leads", "industry_pack_version", "INTEGER NOT NULL DEFAULT 1");
+    ensureColumn("leads", "project_recipe", "TEXT");
+    ensureColumn("leads", "project_recipe_version", "INTEGER");
     ensureColumn("leads", "primary_platform", "TEXT NOT NULL DEFAULT 'shopify'");
     ensureColumn("leads", "automation_goal", "TEXT NOT NULL DEFAULT 'operations_alerts'");
     ensureColumn("leads", "site_type", "TEXT NOT NULL DEFAULT 'none'");

@@ -40,6 +40,8 @@ OPERATOR_FROM_EMAIL=Autopilot HQ <notifications@example.com>
 
 價格欄位使用金流供應商的最小貨幣單位，不是顯示字串。例如 USD 650.00 寫成 `65000`；部署其他幣別時必須先確認供應商與該幣別使用的 exponent，再用測試訂單核對。
 
+`AUTOPILOT_BASE_URL` 同時用於 canonical、hreflang、Open Graph、robots 與 sitemap。正式環境必須設為該站的公開 `https://` origin，不得包含路徑、帳密、query 或 fragment；設定錯誤會讓搜尋引擎取得錯誤網址。
+
 `NEXT_PUBLIC_CHECKOUT_URL` 會寫入瀏覽器 bundle；修改後必須重建 web 映像。
 
 ## 2. 建置並啟動

@@ -13,10 +13,12 @@ import {
   isDeploymentChoiceAllowed,
   siteTypes
 } from "@/lib/site-deployment";
+import { getProjectRecipe, projectRecipeIdSchema } from "@/lib/project-recipes";
 
 export const intakeSchema = z.object({
   locale: z.enum(supportedLocales).default("en"),
   industryPack: z.enum(industryPackIds).default("commerce_ops"),
+  projectRecipe: projectRecipeIdSchema.optional(),
   primaryPlatform: z.enum(["shopify", "email", "spreadsheet", "calendar", "crm", "marketplace", "website", "other"]).default("shopify"),
   automationGoal: z.enum(automationGoals).default("operations_alerts"),
   brandName: z.string().trim().min(2).max(80),
@@ -39,6 +41,14 @@ export const intakeSchema = z.object({
   marketingConsent: z.boolean().default(false),
   companyNote: z.string().trim().max(1000).default("")
 }).superRefine((input, context) => {
+  if (input.projectRecipe) {
+    const recipe = getProjectRecipe(input.projectRecipe);
+    if (!recipe || recipe.industryPackId !== input.industryPack) {
+      context.addIssue({ code: "custom", path: ["projectRecipe"], message: "Project recipe does not match the selected industry pack" });
+    } else if (!(recipe.goals as readonly string[]).includes(input.automationGoal)) {
+      context.addIssue({ code: "custom", path: ["automationGoal"], message: "Project recipe does not support the selected automation goal" });
+    }
+  }
   if (input.automationGoal === "website_launch" && input.siteType === "none") {
     context.addIssue({ code: "custom", path: ["siteType"], message: "Website launch requires a site type" });
   }
