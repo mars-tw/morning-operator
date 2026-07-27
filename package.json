@@ -37,7 +37,7 @@
     "verify": "pnpm security:secrets && pnpm showcase:verify && pnpm typecheck && pnpm test && pnpm build && pnpm smoke && pnpm restore-check"
   },
   "dependencies": {
-    "better-sqlite3": "12.11.1",
+    "better-sqlite3": "13.0.1",
     "next": "16.2.10",
     "pino": "10.3.1",
     "react": "19.2.7",
